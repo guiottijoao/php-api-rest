@@ -1,30 +1,40 @@
-
 <?php
-error_log('Sou um log');
-echo "Olá mundo";
 
+require_once 'config/Database.php';
+require_once 'controllers/CategoryController.php';
 
-$host = "pgsql_desafio";
-$db = "applicationphp";
-$user = "root";
-$pw = "root";
+$database =  new Database();
+$db = $database::getConnection();
 
-$myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri = explode('/', trim($uri, '/'));
+$route = $uri[0];
+$method = $_SERVER['REQUEST_METHOD'];
 
-// exemplo de insert
-$statement = $myPDO->prepare("INSERT INTO mytable (DESCRIPTION) VALUES ('TEST PHP')");
-$statement->execute();
+$actions = [
+  'GET' => 'index',
+  'POST' => 'store',
+  'PUT' => 'update',
+  'DELETE' => 'destroy'
+];
 
-// exemplo de fetch
-$statement1 = $myPDO->query("SELECT * FROM mytable");
-$data = $statement1->fetch();
+$controllers = [
+  'categories' => 'CategoryController',
+];
 
-echo "<br>";
-print_r($data);
+if (isset($controllers[$route])) {
+  $controllerName = $controllers[$route];
+  $controller = new $controllerName($db);
 
-// exemplo de fetch2
-$statement2 = $myPDO->query("SELECT * FROM mytable");
-$data2 = $statement2->fetchALL();
+  $action = $actions[$method];
 
-echo "<br>";
-print_r($data2);
+  if (method_exists($controller, $action)) {
+    $controller->$action();
+  } else {
+    http_response_code(405);
+    echo json_encode(["error" => "Method not allowed."]);
+  }
+} else {
+  http_response_code(404);
+  echo json_encode(["error" => "Route not found."]);
+}
