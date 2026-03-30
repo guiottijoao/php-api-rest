@@ -11,11 +11,12 @@ class CategoryController
     $this->db = $db;
   }
 
-  public function index() {
+  public function index()
+  {
     try {
       $model = new Category($this->db);
       $data = $model->list();
-  
+
       header('Content-Type: application/json');
       echo json_encode($data);
     } catch (Exception $e) {
@@ -23,61 +24,43 @@ class CategoryController
     }
   }
 
-//   public function store(array $data)
-//   {
-//     try {
-//       $this->validate($data);
+  public function store()
+  {
+    try {
+      header('Content-Type: applicatio/json');
 
-//       $stmt = $this->db->prepare("INSERT INTO categories (name, tax) VALUES (:name, :tax)");
-//       $stmt->bindValue(':name', $this->sanitize($data['name']), PDO::PARAM_STR);
-//       $stmt->bindValue(':tax', (float)$data['tax']);
+      $input = json_decode(file_get_contents("php://input"), true);
 
-//       return $stmt->execute();
-//     } catch (Exception $e) {
-//       throw $e;
-//     }
-//   }
+      if (empty($input['name'])) {
+        throw new Exception("Name is required.", 400);
+      }
 
-//   private function validate(array $data)
-//   {
-//     $name = trim($data['name']);
-//     $tax = $data['tax'];
+      if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $input['name'])) {
+        throw new Exception("Name contains invalid characters.", 400);
+      }
 
-//     if (empty($name)) {
-//       throw new Exception("Category name is required.");
-//     }
+      if (!isset($input['tax']) || !is_numeric($input['tax'])) {
+        throw new Exception("Tax must be a number between 0 and 100.", 400);
+      }
 
-//     if (mb_strlen($name) > 20) {
-//       throw new Exception("Category name cannot exceed 20 characters.");
-//     }
+      if ($input['tax'] < 0 || $input['tax'] > 100) {
+        throw new Exception("Tax must be a number between 0 and 100", 400);
+      }
 
-//     if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)) {
-//       throw new Exception("Name contains invalid characters.");
-//     }
+      $model = new Category($this->db);
+      $result = $model->save($input);
 
-//     if ($this->nameExists($name)) {
-//       throw new Exception("A category with this name already exists.");
-//     }
+      if ($result === true) {
+        http_response_code(201);
+        echo json_encode(["msg" => "Category created successfully."]);
+      } else {
+        throw new Exception("Cannot process category data.", 400);
+      }
+    } catch (Exception $e) {
+      $code = (int)$e->getCode();
+      http_response_code($code ?: 500);
 
-//     if ($tax < 0 || $tax > 100) {
-//       throw new Exception("Tax must be a number between 0 and 100");
-//     }
-//   }
-
-//   private function nameExists(string $name)
-//   {
-//     $trimmedName = trim($name);
-//     $normalizedName = str_replace(' ', '', $trimmedName);
-
-//     $query = "SELECT COUNT(*) FROM categories WHERE LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)";
-//     $stmt = $this->db->prepare($query);
-//     $stmt->bindValue(':normalizedName', $normalizedName);
-//     $stmt->execute();
-//     return $stmt->fetchColumn() > 0;
-//   }
-
-//   private function sanitize(string $string)
-//   {
-//     return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
-//   }
+      echo json_encode(["error" => $e->getMessage()]);
+    }
+  }
 }
