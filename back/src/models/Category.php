@@ -27,6 +27,26 @@ class Category
     return $stmt->execute();
   }
 
+  public function delete($categoryId)
+  {
+    $check_existence_stmt = $this->db->query("SELECT code FROM categories WHERE code = '$categoryId'");
+    if (!$check_existence_stmt->fetchColumn()) {
+      throw new Error("Category not found.", 404);
+    }
+
+    $associated_registers_stmt = $this->db->query(
+      "SELECT * FROM products p
+      WHERE p.category_code = '$categoryId'
+      AND p.status = 'active'"
+    );
+    if ($associated_registers_stmt->fetch()) {
+      throw new Exception("Can't delete, this item has associated registers.", 422);
+    }
+
+    $stmt = $this->db->prepare('UPDATE categories SET status = :status WHERE code = :code');
+    return $stmt->execute(["code" => $categoryId, "status" => 'inactive']);
+  }
+
   private function validate(array $data)
   {
     $name = $data['name'];

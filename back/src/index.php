@@ -15,7 +15,7 @@ $actions = [
   'GET' => 'index',
   'POST' => 'store',
   'PUT' => 'update',
-  'DELETE' => 'destroy'
+  'DELETE' => 'delete'
 ];
 
 $controllers = [

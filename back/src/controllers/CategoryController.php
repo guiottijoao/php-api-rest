@@ -63,4 +63,17 @@ class CategoryController
       echo json_encode(["error" => $e->getMessage()]);
     }
   }
+
+  public function delete($categoryId)
+  {
+    try {
+      $model = new Category($this->db);
+      $model->delete($categoryId);
+      http_response_code(204);
+    } catch (Exception $e) {
+      $code = (int)$e->getCode() ?: 500;
+      http_response_code($code);
+      echo json_encode(["error" => $e->getMessage()])
+    }
+  }
 }
