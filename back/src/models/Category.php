@@ -24,11 +24,12 @@ class Category extends BaseModel
   public function save($data)
   {
     $this->validate($data);
+    $businessCode = parent::generateBusinessCode();
 
     $stmt = $this->db->prepare("INSERT INTO categories (name, tax, business_code) VALUES (:name, :tax, :business_code)");
     $stmt->bindValue(':name', $this->sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':tax', (float)$data['tax']);
-    $stmt->bindValue(':business_code', $this->generateBusinessCode());
+    $stmt->bindValue(':business_code', $businessCode);
 
     return $stmt->execute();
   }
@@ -51,12 +52,6 @@ class Category extends BaseModel
     }
 
     return parent::delete($categoryId);
-  }
-
-  private function generateBusinessCode()
-  {
-    $stmt = $this->db->query("SELECT COALESCE(MAX(business_code) + 1, 1) FROM categories WHERE status = 'active'");
-    return $stmt->fetchColumn();
   }
 
   private function validate(array $data)
