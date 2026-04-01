@@ -2,6 +2,7 @@
 
 require_once 'config/Database.php';
 require_once 'controllers/CategoryController.php';
+require_once 'controllers/ProductsController.php';
 
 $database =  new Database();
 $db = $database::getConnection();
@@ -12,6 +13,7 @@ $route = $uri[0];
 $id = $uri[1] ?? null;
 $method = $_SERVER['REQUEST_METHOD'];
 
+// http method => controller method
 $actions = [
   'GET' => 'index',
   'POST' => 'store',
@@ -19,8 +21,10 @@ $actions = [
   'DELETE' => 'delete'
 ];
 
+// route => controller
 $controllers = [
   'categories' => 'CategoryController',
+  'products' => 'ProductsController',
 ];
 
 if (isset($controllers[$route])) {

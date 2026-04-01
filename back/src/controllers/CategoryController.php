@@ -35,6 +35,7 @@ class CategoryController
       header('Content-Type: applicatio/json');
 
       $input = json_decode(file_get_contents("php://input"), true);
+      
       if (!$input) throw new Exception("Required fields not filled.");
 
       foreach($input as $field => $value) {
