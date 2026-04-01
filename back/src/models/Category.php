@@ -63,10 +63,6 @@ class Category extends BaseModel
   {
     $name = $data['name'];
 
-    $check_repeated_name_stmt = $this->db->prepare("SELECT name FROM categories where name = :name");
-    $check_repeated_name_stmt->execute([":name" => $name]);
-    if ($check_repeated_name_stmt->fetch()) throw new Exception("This category is already registered.", 422);
-
     if (mb_strlen($name) > 20) {
       throw new Exception("Category name cannot exceed 20 characters.", 400);
     }

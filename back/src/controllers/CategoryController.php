@@ -35,20 +35,19 @@ class CategoryController
       header('Content-Type: applicatio/json');
 
       $input = json_decode(file_get_contents("php://input"), true);
+      if (!$input) throw new Exception("Required fields not filled.");
 
-      if (empty($input['name'])) {
-        throw new Exception("Name is required.", 400);
+      foreach($input as $field => $value) {
+        if (empty($value)) {
+          throw new Exception("Field $field is required.", 400);
+        }
       }
 
       if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $input['name'])) {
         throw new Exception("Name contains invalid characters.", 400);
       }
 
-      if (!isset($input['tax']) || !is_numeric($input['tax'])) {
-        throw new Exception("Tax must be a number between 0 and 100.", 400);
-      }
-
-      if ($input['tax'] < 0 || $input['tax'] > 100) {
+      if (!is_numeric($input['tax']) || $input['tax'] < 0 || $input['tax'] > 100) {
         throw new Exception("Tax must be a number between 0 and 100", 400);
       }
 
