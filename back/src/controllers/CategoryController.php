@@ -43,14 +43,6 @@ class CategoryController
         }
       }
 
-      if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $input['name'])) {
-        throw new Exception("Name contains invalid characters.", 400);
-      }
-
-      if (!is_numeric($input['tax']) || $input['tax'] < 0 || $input['tax'] > 100) {
-        throw new Exception("Tax must be a number between 0 and 100", 400);
-      }
-
       $model = new Category($this->db);
       $result = $model->save($input);
 

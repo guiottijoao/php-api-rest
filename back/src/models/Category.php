@@ -62,6 +62,7 @@ class Category extends BaseModel
   private function validate(array $data)
   {
     $name = $data['name'];
+    $tax = $data['tax'];
 
     if (mb_strlen($name) > 20) {
       throw new Exception("Category name cannot exceed 20 characters.", 400);
@@ -69,6 +70,14 @@ class Category extends BaseModel
 
     if ($this->nameExists($name)) {
       throw new Exception("A category with this name already exists.", 409);
+    }
+
+    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)) {
+      throw new Exception("Name contains invalid characters.", 400);
+    }
+
+    if (!is_numeric($tax) || $tax < 0 || $tax > 100) {
+      throw new Exception("Tax must be a number between 0 and 100", 400);
     }
   }
 
