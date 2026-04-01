@@ -9,6 +9,7 @@ $db = $database::getConnection();
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode('/', trim($uri, '/'));
 $route = $uri[0];
+$id = $uri[1] ?? null;
 $method = $_SERVER['REQUEST_METHOD'];
 
 $actions = [
@@ -29,7 +30,11 @@ if (isset($controllers[$route])) {
   $action = $actions[$method];
 
   if (method_exists($controller, $action)) {
-    $controller->$action();
+    if ($id !== null) {
+      $controller->$action($id);
+    } else {
+      $controller->$action();
+    }
   } else {
     http_response_code(405);
     echo json_encode(["error" => "Method not allowed."]);

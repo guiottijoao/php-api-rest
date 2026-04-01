@@ -8,21 +8,31 @@ class Category
     $this->db = $db;
   }
 
-  public function list()
+  public function list($id)
   {
-    $stmt = $this->db->prepare("SELECT * FROM categories");
+    if (!$id) {
+      $stmt = $this->db->prepare("SELECT * FROM categories");
+    } else {
+      $stmt = $this->db->prepare("SELECT * FROM categories c WHERE c.code = '$id'");
+      $stmt->execute();
+      if (!$stmt->fetch()) {
+        throw new Exception("Category with provided id does not exist.", 404);
+      }
+    }
     $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+
   public function save($data)
   {
     $this->validate($data);
 
-    $stmt = $this->db->prepare("INSERT INTO categories (name, tax) VALUES (:name, :tax)");
+    $stmt = $this->db->prepare("INSERT INTO categories (name, tax, business_code) VALUES (:name, :tax, :business_code)");
     $stmt->bindValue(':name', $this->sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':tax', (float)$data['tax']);
+    $stmt->bindValue(':business_code', $this->generateBusinessCode());
 
     return $stmt->execute();
   }
@@ -31,7 +41,7 @@ class Category
   {
     $check_existence_stmt = $this->db->query("SELECT code FROM categories WHERE code = '$categoryId'");
     if (!$check_existence_stmt->fetchColumn()) {
-      throw new Error("Category not found.", 404);
+      throw new Exception("Category not found.", 404);
     }
 
     $associated_registers_stmt = $this->db->query(
@@ -45,6 +55,12 @@ class Category
 
     $stmt = $this->db->prepare('UPDATE categories SET status = :status WHERE code = :code');
     return $stmt->execute(["code" => $categoryId, "status" => 'inactive']);
+  }
+
+  private function generateBusinessCode()
+  {
+    $stmt = $this->db->query("SELECT COALESCE(MAX(business_code) + 1, 1) FROM categories WHERE status = 'active'");
+    return $stmt->fetchColumn();
   }
 
   private function validate(array $data)

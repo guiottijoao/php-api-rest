@@ -11,16 +11,18 @@ class CategoryController
     $this->db = $db;
   }
 
-  public function index()
+  public function index($id = null)
   {
     try {
       $model = new Category($this->db);
-      $data = $model->list();
+      $data = $model->list($id);
 
       header('Content-Type: application/json');
       echo json_encode($data);
     } catch (Exception $e) {
-      throw $e;
+      $code = (int)$e->getCode();
+      http_response_code($code ?: 500);
+      echo json_encode(["error: " => $e->getMessage()]);
     }
   }
 
@@ -68,12 +70,15 @@ class CategoryController
   {
     try {
       $model = new Category($this->db);
+      if (!$categoryId) {
+        throw new Exception("Id not provided.", 400);
+      }
       $model->delete($categoryId);
       http_response_code(204);
     } catch (Exception $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["error" => $e->getMessage()])
+      echo json_encode(["error" => $e->getMessage()]);
     }
   }
 }
