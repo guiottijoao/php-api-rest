@@ -15,8 +15,11 @@ class CategoryController
   {
     try {
       $model = new Category($this->db);
-      $data = $model->list($id);
-
+      if ($id) {
+        $data = $model->findById($id);
+      } else {
+        $data = $model->list();
+      }
       header('Content-Type: application/json');
       echo json_encode($data);
     } catch (Exception $e) {

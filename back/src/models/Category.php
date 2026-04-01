@@ -1,30 +1,25 @@
 <?php
-class Category
+require_once __DIR__ . '/BaseModel.php';
+
+class Category extends BaseModel
 {
-  private $db;
+  protected $table = 'categories';
 
   public function __construct($db)
   {
     $this->db = $db;
   }
 
-  public function list($id)
+  // não precisa criar função list() porque não precisa tratar e ja tem na classe pai
+
+  public function findById($id)
   {
-    if (!$id) {
-      $stmt = $this->db->prepare("SELECT * FROM categories");
-    } else {
-      $stmt = $this->db->prepare("SELECT * FROM categories c WHERE c.code = '$id'");
-    }
-    
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    if (empty($result)) {
-      throw new Exception("Category with provided id does not exist.", 404);
+    $result = parent::findById($id);
+    if (!$result) {
+      throw new Exception("Category not found.", 404);
     }
     return $result;
   }
-
 
   public function save($data)
   {
@@ -40,7 +35,8 @@ class Category
 
   public function delete($categoryId)
   {
-    $check_existence_stmt = $this->db->query("SELECT code FROM categories WHERE code = '$categoryId'");
+    $check_existence_stmt = $this->db->prepare("SELECT code FROM categories WHERE code = :id");
+    $check_existence_stmt->execute([":id" => $categoryId]);
     if (!$check_existence_stmt->fetchColumn()) {
       throw new Exception("Category not found.", 404);
     }
@@ -54,8 +50,7 @@ class Category
       throw new Exception("Can't delete, this item has associated registers.", 422);
     }
 
-    $stmt = $this->db->prepare('UPDATE categories SET status = :status WHERE code = :code');
-    return $stmt->execute(["code" => $categoryId, "status" => 'inactive']);
+    return parent::delete($categoryId);
   }
 
   private function generateBusinessCode()
