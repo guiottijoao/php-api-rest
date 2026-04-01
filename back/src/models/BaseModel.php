@@ -35,4 +35,19 @@ abstract class BaseModel
     $stmt->execute();
     return $stmt->fetchColumn();
   }
+
+  public function sanitize(string $string)
+  {
+    return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
+  }
+
+  public function nameExists(string $name)
+  {
+    $trimmedName = trim($name);
+    $normalizedName = str_replace(' ', '', $trimmedName);
+
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM {$this->table} WHERE status = 'active' AND LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)");
+    $stmt->execute([':normalizedName' => $normalizedName]);
+    return $stmt->fetchColumn() > 0;
+  }
 }

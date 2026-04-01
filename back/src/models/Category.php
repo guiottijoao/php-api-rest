@@ -27,7 +27,7 @@ class Category extends BaseModel
     $businessCode = parent::generateBusinessCode();
 
     $stmt = $this->db->prepare("INSERT INTO categories (name, tax, business_code) VALUES (:name, :tax, :business_code)");
-    $stmt->bindValue(':name', $this->sanitize($data['name']), PDO::PARAM_STR);
+    $stmt->bindValue(':name', parent::sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':tax', (float)$data['tax']);
     $stmt->bindValue(':business_code', $businessCode);
 
@@ -63,7 +63,7 @@ class Category extends BaseModel
       throw new Exception("Category name cannot exceed 20 characters.", 400);
     }
 
-    if ($this->nameExists($name)) {
+    if (parent::nameExists($name)) {
       throw new Exception("A category with this name already exists.", 409);
     }
 
@@ -74,22 +74,5 @@ class Category extends BaseModel
     if (!is_numeric($tax) || $tax < 0 || $tax > 100) {
       throw new Exception("Tax must be a number between 0 and 100", 400);
     }
-  }
-
-  private function nameExists(string $name)
-  {
-    $trimmedName = trim($name);
-    $normalizedName = str_replace(' ', '', $trimmedName);
-
-    $query = "SELECT COUNT(*) FROM categories WHERE LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)";
-    $stmt = $this->db->prepare($query);
-    $stmt->bindValue(':normalizedName', $normalizedName);
-    $stmt->execute();
-    return $stmt->fetchColumn() > 0;
-  }
-
-  private function sanitize(string $string)
-  {
-    return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
   }
 }
