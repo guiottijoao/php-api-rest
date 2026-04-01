@@ -14,14 +14,15 @@ class Category
       $stmt = $this->db->prepare("SELECT * FROM categories");
     } else {
       $stmt = $this->db->prepare("SELECT * FROM categories c WHERE c.code = '$id'");
-      $stmt->execute();
-      if (!$stmt->fetch()) {
-        throw new Exception("Category with provided id does not exist.", 404);
-      }
     }
+    
     $stmt->execute();
-
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    if (empty($result)) {
+      throw new Exception("Category with provided id does not exist.", 404);
+    }
+    return $result;
   }
 
 
