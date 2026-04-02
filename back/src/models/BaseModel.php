@@ -37,8 +37,9 @@ abstract class BaseModel
 
   public function generateBusinessCode()
   {
-    $status = $this->table == 'orders' ? 'open' : 'active';
-    $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM {$this->table} WHERE status = :status");
+    $status = $this->table === 'orders' ? 'open' : 'active';
+    $table = $this-> table === 'order_item' ? 'orders' : $this->table;
+    $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM {$table} WHERE status = :status");
     $stmt->execute([":status" => $status]);
     return $stmt->fetchColumn();
   }
