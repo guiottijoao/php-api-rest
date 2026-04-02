@@ -47,7 +47,7 @@ class Order extends BaseModel
       throw new Exception("Can't delete, this item has associated registers.", 422);
     }
 
-    return parent::delete($orderId);
+    return parent::softDelete($orderId);
   }
 
   private function validate(array $data)

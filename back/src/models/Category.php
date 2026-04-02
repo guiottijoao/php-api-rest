@@ -51,7 +51,7 @@ class Category extends BaseModel
       throw new Exception("Can't delete, this item has associated registers.", 422);
     }
 
-    return parent::delete($categoryId);
+    return parent::softDelete($categoryId);
   }
 
   private function validate(array $data)

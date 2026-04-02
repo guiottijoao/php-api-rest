@@ -70,7 +70,7 @@ class OrderController
         throw new Exception("Id not provided.", 400);
       }
 
-      $model->softDelete($orderId);
+      $model->delete($orderId);
       http_response_code(200);
     } catch (\Throwable $e) {
       $code = (int)$e->getCode();
