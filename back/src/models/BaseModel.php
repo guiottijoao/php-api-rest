@@ -23,11 +23,16 @@ abstract class BaseModel
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function delete($id)
+  public function softDelete($id)
   {
     $status = $this->table == 'orders' ? 'closed' : 'inactive';
     $stmt = $this->db->prepare("UPDATE {$this->table} SET status = :status WHERE code = :code");
     $stmt->execute([':code' => $id, ':status' => $status]);
+  }
+
+  public function delete($id) {
+    $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE code = :id");
+    $stmt->execute([':id' => $id]);
   }
 
   public function generateBusinessCode()

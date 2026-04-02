@@ -68,7 +68,7 @@ class CategoryController
       if (!$categoryId) {
         throw new Exception("Id not provided.", 400);
       }
-      $model->delete($categoryId);
+      $model->softDelete($categoryId);
       http_response_code(204);
     } catch (Exception $e) {
       $code = (int)$e->getCode() ?: 500;
