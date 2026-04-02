@@ -19,20 +19,22 @@ abstract class BaseModel
 
   public function list()
   {
-    $stmt = $this->db->query("SELECT * FROM {$this->table}");
+    $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   public function delete($id)
   {
-    $stmt = $this->db->prepare("UPDATE {$this->table} SET status = 'inactive' WHERE code = :code");
-    $stmt->execute([':code' => $id]);
+    $status = $this->table == 'orders' ? 'closed' : 'inactive';
+    $stmt = $this->db->prepare("UPDATE {$this->table} SET status = :status WHERE code = :code");
+    $stmt->execute([':code' => $id, ':status' => $status]);
   }
 
   public function generateBusinessCode()
   {
-    $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM {$this->table} WHERE status = 'active'");
-    $stmt->execute();
+    $status = $this->table == 'orders' ? 'open' : 'active';
+    $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM {$this->table} WHERE status = :status");
+    $stmt->execute([":status" => $status]);
     return $stmt->fetchColumn();
   }
 

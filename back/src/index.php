@@ -3,6 +3,7 @@
 require_once 'config/Database.php';
 require_once 'controllers/CategoryController.php';
 require_once 'controllers/ProductsController.php';
+require_once 'controllers/OrderController.php';
 
 $database =  new Database();
 $db = $database::getConnection();
@@ -25,6 +26,7 @@ $actions = [
 $controllers = [
   'categories' => 'CategoryController',
   'products' => 'ProductsController',
+  'orders' => 'OrderController',
 ];
 
 if (isset($controllers[$route])) {
