@@ -53,7 +53,7 @@ class ProductsController
 
       if ($result) {
         http_response_code(201);
-        echo json_encode(["msg" => "Category created successfully."]);
+        echo json_encode(["msg" => "Product created successfully."]);
       } else {
         throw new Exception("Cannot process product data.", 400);
       }
