@@ -22,11 +22,33 @@ class Order extends BaseModel
   public function save($data)
   {
     $this->validate($data);
-    
+
     $businessCode = parent::generateBusinessCode();
     $stmt = $this->db->prepare("INSERT INTO orders (total, tax, business_code) VALUES (:total, :tax, :business_code)");
 
     return $stmt->execute([":total" => (float)$data['total'], ":tax" => (float)$data['tax'], ":business_code" => $businessCode]);
+  }
+
+  public function finish($orderId)
+  {
+    $order_select_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
+    $order_select_stmt->execute([":code" => $orderId]);
+    $openOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($openOrder) {
+      $openOrderId = $openOrder['code'];
+      $order_item_select_stmt = $this->db->prepare("SELECT * FROM order_item oi WHERE oi.order_code = :order_code");
+      $order_item_select_stmt->execute([":order_code" => $openOrderId]);
+      $orderItems = $order_item_select_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      if ($orderItems) {
+        foreach ($orderItems as $item) {
+          $this->discountStock($item);
+        }
+        $open_order_update_stmt = $this->db->prepare("UPDATE orders SET status = 'closed'");
+        return $open_order_update_stmt->execute();
+      }
+    }
+    throw new Exception("You dont have items in your order.");
   }
 
   public function delete($orderId)
@@ -62,5 +84,14 @@ class Order extends BaseModel
     if (!is_numeric($tax)) {
       throw new Exception("Tax must be a number.", 400);
     }
+  }
+
+  private function discountStock(array $orderItem)
+  {
+    $productId = $orderItem['product_code'];
+    $orderItemAmount = $orderItem['amount'];
+
+    $discount_statement = $this->db->prepare("UPDATE products p SET amount = amount - :item_amount WHERE p.code = :product_code");
+    $discount_statement->execute([":item_amount" =>  $orderItemAmount, "product_code" => $productId]);
   }
 }

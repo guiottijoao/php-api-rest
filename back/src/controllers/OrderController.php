@@ -30,8 +30,9 @@ class OrderController
     }
   }
 
-  public function store() {
-    try{
+  public function store()
+  {
+    try {
       header('Content-type: application/json');
 
       $input = json_decode(file_get_contents('php://input'), true);
@@ -63,7 +64,21 @@ class OrderController
     }
   }
 
-  public function delete($orderId) {
+  public function update($orderId)
+  {
+    try {
+      header('Content-type: application/json');
+
+      $model = new Order($this->db);
+      $model->finish($orderId);
+      echo json_encode(["msg" => "Order finished successfully."]);
+    } catch (Exception $e) {
+      throw $e;
+    }
+  }
+
+  public function delete($orderId)
+  {
     try {
       $model = new Order($this->db);
       if (!$orderId) {

@@ -28,7 +28,7 @@ $controllers = [
   'categories' => 'CategoryController',
   'products' => 'ProductsController',
   'orders' => 'OrderController',
-  'order-items' => 'OrderItemController'
+  'order-items' => 'OrderItemController',
 ];
 
 if (isset($controllers[$route])) {
