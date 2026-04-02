@@ -4,6 +4,7 @@ require_once 'config/Database.php';
 require_once 'controllers/CategoryController.php';
 require_once 'controllers/ProductsController.php';
 require_once 'controllers/OrderController.php';
+require_once 'controllers/OrderItemController.php';
 
 $database =  new Database();
 $db = $database::getConnection();
@@ -27,11 +28,17 @@ $controllers = [
   'categories' => 'CategoryController',
   'products' => 'ProductsController',
   'orders' => 'OrderController',
+  'order-items' => 'OrderItemController'
 ];
 
 if (isset($controllers[$route])) {
   $controllerName = $controllers[$route];
   $controller = new $controllerName($db);
+  
+  if (!isset($controller)) {
+    http_response_code(404);
+    echo json_encode(["error" => "Controller not found"]);
+  }
 
   $action = $actions[$method];
 
