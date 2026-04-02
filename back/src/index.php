@@ -5,6 +5,8 @@ require_once 'controllers/CategoryController.php';
 require_once 'controllers/ProductsController.php';
 require_once 'controllers/OrderController.php';
 require_once 'controllers/OrderItemController.php';
+require_once 'controllers/FinishOrderController.php';
+require_once 'controllers/CancelOrderController.php';
 
 $database =  new Database();
 $db = $database::getConnection();
@@ -28,6 +30,8 @@ $controllers = [
   'categories' => 'CategoryController',
   'products' => 'ProductsController',
   'orders' => 'OrderController',
+  'finish-order' => 'FinishOrderController',
+  'cancel-order' => 'CancelOrderController',
   'order-items' => 'OrderItemController',
 ];
 

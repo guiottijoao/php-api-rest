@@ -51,6 +51,21 @@ class Order extends BaseModel
     throw new Exception("You dont have items in your order.");
   }
 
+  public function cancel($orderId) {
+      $active_order_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
+      $active_order_stmt->execute([":code" => $orderId]);
+      $order = $active_order_stmt->fetch(PDO::FETCH_ASSOC);
+      $order_items_stmt = $this->db->query("SELECT * FROM order_item");
+      $orderItems = $order_items_stmt->fetch(PDO::FETCH_ASSOC);
+      if (!$order || !$orderItems) return;
+
+      $delete_order_items_stmt = $this->db->prepare("DELETE FROM order_item o WHERE o.order_code = :order_code");
+      $delete_order_items_stmt->execute([":order_code" => $order['code']]);
+      
+      $update_order_total_and_tax = $this->db->prepare("UPDATE orders o SET total = 0, tax = 0 WHERE  o.code = :order_code");
+      $update_order_total_and_tax->execute([":order_code" => $order['code']]);
+  }
+
   public function delete($orderId)
   {
     $check_existence_stmt = $this->db->prepare("SELECT code FROM orders WHERE code = :id");
