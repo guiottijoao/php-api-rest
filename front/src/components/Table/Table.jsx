@@ -1,30 +1,27 @@
 import styles from "./Table.module.css";
 
-function Table() {
+function Table({ data, columns, onDelete }) {
   return (
-    <div class={styles.tableContainer}>
+    <div className={styles.tableContainer}>
       <table>
-        <tr>
-          <th>Code</th>
-          <th>Category</th>
-          <th>Tax</th>
-          <th>Actions</th>
-        </tr>
-        <tbody id="categories-table-body">
-          {/* foreach ($categories as $cat): */}
+        <thead>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <a
-                className="delete-btn"
-                onclick="return confirm('Delete category?')"
-              >
-                Delete
-              </a>
-            </td>
+            {columns.map(col => (
+              <th key={col.key} >{col.label}</th>
+            ))}
+            <th>Actions</th>
           </tr>
+        </thead>
+        
+        <tbody id="categories-table-body">
+          {data.map((row, index) => (
+            <tr key={index}>
+              {columns.map(col => (
+                <td key={col.key}>{row[col.key]}</td>
+              ))}
+              <td ><button onClick={() => onDelete(row['code'])} className='delete-btn'>Delete</button></td>
+            </tr>
+          ))}
         </tbody>
       </table>
       <div id="categories-empty-state"></div>
