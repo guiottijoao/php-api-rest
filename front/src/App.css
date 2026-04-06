@@ -1,38 +1,86 @@
-.App {
-  text-align: center;
-}
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+*,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter";
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  height: 100vh;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+span {
+  font-size: 14px;
+  color: rgb(130, 130, 130);
+}
+p {
+  font-size: 1rem;
+}
+h1 {
+  cursor: default;
+}
+select {
+  width: 100%;
+  height: 1.75rem;
+}
+input,
+button {
+  height: 1.5rem;
+  padding: 0 0.5rem;
+}
+a, button {
+  cursor: pointer;
+}
+.container {
+  height: 75vh;
+  padding: 1.5rem 1rem 2rem;
+}
+main.mainContent {
+  height: 100%;
   display: flex;
+  align-items: start;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+.productSection {
+  display: flex;
+  width: 50%;
+  height: 100%;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
+  align-items: end;
 }
-
-.App-link {
-  color: #61dafb;
+hr {
+  width: 1px;
+  height: 100%;
+  background-color: rgb(104, 104, 104);
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.delete-btn, .view-btn {
+  background-color: #c5c5c5;
+  text-decoration: none;
+  color: black;
+  border: none;
+  transition: ease-in-out 100ms;
+  padding: .2rem;
+}
+.view-btn {
+  background-color: #544fe6;
+}
+.delete-btn:hover {
+  background-color: #9c9c9c;
+}
+tr:hover .action-cell {
+  visibility: visible;
+}
+.cancel-btn {
+  background-color: #c5c5c5;
+  transition: ease-in-out 100ms;
+  border: none;
+}
+.cancel-btn:hover {
+  background-color: #9c9c9c;
+}
+.actions > button {
+  cursor: pointer;
+  padding: 0 3rem;
 }

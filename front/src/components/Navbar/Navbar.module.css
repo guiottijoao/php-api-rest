@@ -1,0 +1,23 @@
+.navbar {
+  background-color: #6a65ff;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.navbar > a {
+  font-size: 2rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: black;
+}
+.navbar > ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+.navbar > ul > li > a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}

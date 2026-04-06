@@ -1,0 +1,31 @@
+.formWrapper {
+  width: 50%;
+  flex-direction: column;
+  display: flex;
+  gap: 0.5rem;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+.submitBtn {
+  background-color: #6a65ff;
+  transition: ease-in-out 100ms;
+  border: none;
+  height: 2rem;
+}
+.submitBtn:hover {
+  background-color: #544fe6;
+}
+.formFields {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+.formFields > input {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
