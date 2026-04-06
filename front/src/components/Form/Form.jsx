@@ -1,23 +1,11 @@
 import styles from "./Form.module.css";
 
-function Form() {
+function Form({formFields}) {
   return (
     <div className={styles.formWrapper}>
       <form>
         <div className={styles.formFields}>
-          <input
-            name="name"
-            type="text"
-            placeholder="Category name"
-          />
-          <input
-            name="tax"
-            type="number"
-            step="0.01"
-            min="0"
-            max="100"
-            placeholder="Tax"
-          />
+          {formFields.map((field) => <input type={field.type} name={field.name} placeholder={field.placeholder} step={field.step} min={field.min} max={field.max} />)}
         </div>
         <button className={styles.submitBtn} type="submit">
           Add Category
