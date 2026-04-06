@@ -28,7 +28,8 @@ button {
   height: 1.5rem;
   padding: 0 0.5rem;
 }
-a, button {
+a,
+button {
   cursor: pointer;
 }
 .container {
@@ -55,13 +56,14 @@ hr {
   height: 100%;
   background-color: rgb(104, 104, 104);
 }
-.delete-btn, .view-btn {
+.delete-btn,
+.view-btn {
   background-color: #c5c5c5;
   text-decoration: none;
   color: black;
   border: none;
   transition: ease-in-out 100ms;
-  padding: .2rem;
+  padding: 0.2rem;
 }
 .view-btn {
   background-color: #544fe6;
@@ -83,4 +85,12 @@ tr:hover .action-cell {
 .actions > button {
   cursor: pointer;
   padding: 0 3rem;
+}
+.swal2-confirm {
+  padding: 8px 16px !important;
+  height: 2rem;
+}
+.swal2-cancel {
+  padding: 8px 16px !important;
+  height: 2rem;
 }
