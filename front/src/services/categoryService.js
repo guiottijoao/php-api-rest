@@ -13,13 +13,16 @@ export const categoryService = {
       headers: { "Content-type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to create category.");
-    return response.json();
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error)
+    }
+    return response.json()
   },
 
   async delete(id) {
     const response = await fetch(`${BASE_URL}/categories/${id}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to delete category.");
   },
