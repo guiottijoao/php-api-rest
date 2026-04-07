@@ -16,9 +16,9 @@ function Products() {
   const dispatch = useDispatch();
 
   const findNameById = (id, data) => {
-    const found = data.find(c => c.code == id)
-    return found?.name
-  }
+    const found = data.find((c) => c.code == id);
+    return found?.name;
+  };
 
   const formFields = [
     { name: "name", type: "text", placeholder: "Product name" },
@@ -32,37 +32,37 @@ function Products() {
       max: "10000000000",
     },
   ];
-  
+
   const [form, setForm] = useState({
     name: "",
     amount: "",
     price: "",
     category_code: "",
   });
-  
+
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchProducts());
   }, [dispatch]);
-  
+
   const { items: categories, loading: categoriesLoading } = useSelector(
     (state) => state.categories,
   );
-  
+
   const {
     items: products,
     loading: productsLoading,
     error,
   } = useSelector((state) => state.products);
-  
+
   const activeCategories = categories.filter((c) => c.status === "active");
   const activeProducts = products.filter((p) => p.status === "active");
-  
+
   const columns = [
     { key: "business_code", label: "Code" },
     { key: "name", label: "Product" },
     { key: "amount", label: "Amount" },
-    { key: "price", label: "Unit price", format: 'currency' },
+    { key: "price", label: "Unit price", format: "currency" },
     { key: "category_code", label: "Category" },
   ];
 
@@ -86,26 +86,26 @@ function Products() {
   };
 
   const handleDeleteProduct = async (id) => {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Delete",
-        cancelButtonText: "Cancel",
-      });
-  
-      if (result.isConfirmed) {
-        const action = await dispatch(deleteProduct(id));
-  
-        if (deleteProduct.rejected.match(action))  {
-          Swal.fire({
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      const action = await dispatch(deleteProduct(id));
+
+      if (deleteProduct.rejected.match(action)) {
+        Swal.fire({
           icon: "error",
           title: "Error",
           text: action.payload,
         });
       }
-      }
-    };
+    }
+  };
 
   return (
     <div className="container">
@@ -125,8 +125,8 @@ function Products() {
 
         <section className="productSection">
           <Table
-          findName={findNameById}
-          associatedRegister={activeCategories}
+            findName={findNameById}
+            associatedRegister={activeCategories}
             data={activeProducts}
             columns={columns}
             onDelete={handleDeleteProduct}
