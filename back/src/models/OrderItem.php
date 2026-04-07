@@ -10,6 +10,20 @@ class OrderItem extends BaseModel
     $this->db = $db;
   }
 
+  public function list()
+  {
+    $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($items as $index => $i) {
+      $items[$index]['total'] = $this->getOrderItemTotalPrice(
+        $i['tax'],
+        $i['price'],
+        $i['amount']
+      );
+    }
+    return $items;
+  }
+
   public function findById($id)
   {
     $result = parent::findById($id);
