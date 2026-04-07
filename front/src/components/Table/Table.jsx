@@ -1,4 +1,5 @@
 import styles from "./Table.module.css";
+import formatField from "../../utils/formatField";
 
 function Table({ data, columns, onDelete, associatedRegister, findName }) {
   return (
@@ -20,7 +21,7 @@ function Table({ data, columns, onDelete, associatedRegister, findName }) {
                 col.key === "category_code" ? (
                   <td key={col.key}>{findName(row[col.key], associatedRegister)}</td>
                 ) : (
-                  <td key={col.key}>{row[col.key]}</td>
+                  <td key={col.key}>{formatField(col, row[col.key])}</td>
                 ),
               )}
               <td>

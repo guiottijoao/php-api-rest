@@ -29,7 +29,7 @@ function Categories() {
   const columns = [
     { key: "business_code", label: "Code" },
     { key: "name", label: "Name" },
-    { key: "tax", label: "Tax" },
+    { key: "tax", label: "Tax", format: "percent" },
   ];
 
   const [form, setForm] = useState({ name: "", tax: "" });
@@ -77,13 +77,13 @@ function Categories() {
     if (result.isConfirmed) {
       const action = await dispatch(deleteCategory(id));
 
-      if (deleteCategory.rejected.match(action))  {
+      if (deleteCategory.rejected.match(action)) {
         Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: action.payload,
-      });
-    }
+          icon: "error",
+          title: "Error",
+          text: action.payload,
+        });
+      }
     }
   };
 

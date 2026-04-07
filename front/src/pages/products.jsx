@@ -62,7 +62,7 @@ function Products() {
     { key: "business_code", label: "Code" },
     { key: "name", label: "Product" },
     { key: "amount", label: "Amount" },
-    { key: "price", label: "Unit price" },
+    { key: "price", label: "Unit price", format: 'currency' },
     { key: "category_code", label: "Category" },
   ];
 
