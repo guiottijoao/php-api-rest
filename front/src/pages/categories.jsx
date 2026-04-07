@@ -36,7 +36,6 @@ function Categories() {
 
   useEffect(() => {
     dispatch(fetchCategories());
-    console.log(activeCategories);
   }, [dispatch]);
 
   const {
@@ -57,11 +56,9 @@ function Categories() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: result.payload,
+        text: result.payload.message,
       });
     }
-    console.log(result);
-
     if (createCategory.fulfilled.match(result)) {
       setForm({ name: "", tax: "" });
       dispatch(clearError());
@@ -78,7 +75,15 @@ function Categories() {
     });
 
     if (result.isConfirmed) {
-      dispatch(deleteCategory(id));
+      const action = await dispatch(deleteCategory(id));
+
+      if (deleteCategory.rejected.match(action))  {
+        Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: action.payload,
+      });
+    }
     }
   };
 
@@ -91,6 +96,8 @@ function Categories() {
           onSubmit={handleSubmit}
           form={form}
           setForm={setForm}
+          page={"categories"}
+          btnLabel="Add category"
         />
 
         <hr />
