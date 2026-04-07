@@ -30,7 +30,7 @@ export const deleteCategory = createAsyncThunk(
       await categoryService.delete(id);
       return id;
     } catch (error) {
-      return rejectWithValue('aa' + error.message);
+      return rejectWithValue(error.message);
     }
   },
 );
