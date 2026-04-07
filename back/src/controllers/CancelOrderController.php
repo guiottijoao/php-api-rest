@@ -18,7 +18,7 @@ class CancelOrderController
 
       $model = new Order($this->db);
       $model->cancel($orderId);
-      echo json_encode(["msg" => "Order cancelled successfully."]);
+      echo json_encode(["message" => "Order cancelled successfully."]);
     } catch (Exception $e) {
       throw $e;
     }

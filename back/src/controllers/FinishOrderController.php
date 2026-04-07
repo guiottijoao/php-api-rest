@@ -18,7 +18,7 @@ class FinishOrderController
 
       $model = new Order($this->db);
       $model->finish($orderId);
-      echo json_encode(["msg" => "Order finished successfully."]);
+      echo json_encode(["message" => "Order finished successfully."]);
     } catch (Exception $e) {
       throw $e;
     }

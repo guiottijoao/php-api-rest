@@ -50,7 +50,7 @@ if (isset($controllers[$route])) {
   
   if (!isset($controller)) {
     http_response_code(404);
-    echo json_encode(["error" => "Controller not found"]);
+    echo json_encode(["message" => "Controller not found"]);
   }
 
   $action = $actions[$method];
@@ -63,9 +63,9 @@ if (isset($controllers[$route])) {
     }
   } else {
     http_response_code(405);
-    echo json_encode(["error" => "Method not allowed."]);
+    echo json_encode(["message" => "Method not allowed."]);
   }
 } else {
   http_response_code(404);
-  echo json_encode(["error" => "Route not found."]);
+  echo json_encode(["message" => "Route not found."]);
 }

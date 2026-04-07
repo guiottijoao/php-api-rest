@@ -26,7 +26,7 @@ class OrderItemController
     } catch (Exception $e) {
       $code = $e->getCode();
       http_response_code($code);
-      echo json_encode(["error: " => $e->getMessage()]);
+      echo json_encode(["message: " => $e->getMessage()]);
     }
   }
 
@@ -53,14 +53,14 @@ class OrderItemController
 
       if ($result) {
         http_response_code(201);
-        echo json_encode(["msg" => "Order item created successfully."]);
+        echo json_encode(["message" => "Order item created successfully."]);
       } else {
         throw new Exception("Cannot process order item data.", 400);
       }
     } catch (Exception $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["error" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 
@@ -77,7 +77,7 @@ class OrderItemController
     } catch (Exception $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["error" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 }

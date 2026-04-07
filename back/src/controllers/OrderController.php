@@ -26,7 +26,7 @@ class OrderController
     } catch (Exception $e) {
       $code = (int)$e->getCode();
       http_response_code($code);
-      echo json_encode(["error: " => $e->getMessage()]);
+      echo json_encode(["message: " => $e->getMessage()]);
     }
   }
 
@@ -53,14 +53,14 @@ class OrderController
 
       if ($result) {
         http_response_code(200);
-        echo json_encode(["msg" => "Order created successfully."]);
+        echo json_encode(["message" => "Order created successfully."]);
       } else {
         throw new Exception("Cannot process order data.", 400);
       }
     } catch (Exception $e) {
       $code = (int)$e->getCode();
       http_response_code($code);
-      echo json_encode(["error:" => $e->getMessage()]);
+      echo json_encode(["message:" => $e->getMessage()]);
     }
   }
 
@@ -77,7 +77,7 @@ class OrderController
     } catch (\Throwable $e) {
       $code = (int)$e->getCode();
       http_response_code($code);
-      echo json_encode(["error" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 }

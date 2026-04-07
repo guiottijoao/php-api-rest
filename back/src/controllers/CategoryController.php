@@ -25,7 +25,7 @@ class CategoryController
     } catch (Exception $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["error: " => $e->getMessage()]);
+      echo json_encode(["message: " => $e->getMessage()]);
     }
   }
 
@@ -49,7 +49,7 @@ class CategoryController
 
       if ($result === true) {
         http_response_code(201);
-        echo json_encode(["msg" => "Category created successfully."]);
+        echo json_encode(["message" => "Category created successfully."]);
       } else {
         throw new Exception("Cannot process category data.", 400);
       }
@@ -57,7 +57,7 @@ class CategoryController
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
 
-      echo json_encode(["error" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 
@@ -73,7 +73,7 @@ class CategoryController
     } catch (Exception $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["error" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 }
