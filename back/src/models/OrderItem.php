@@ -32,7 +32,7 @@ class OrderItem extends BaseModel
     $productPrice = $this->getProductPrice($productId);
     $orderItemTotalTax = $this->calcOrderItemTotalTax($categoryTax, $productPrice, $productAmount);
 
-    $orderItemTotalPrice = $orderItemTotalTax + ($productPrice * $productAmount);
+    $orderItemTotalPrice = $this->getOrderItemTotalPrice($orderItemTotalTax, $productPrice, $productAmount);
 
     $order_items_stmt = $this->db->query("SELECT * FROM order_item");
     $orderItems = $order_items_stmt->fetch();
@@ -55,7 +55,11 @@ class OrderItem extends BaseModel
       $order_select_stmt = $this->db->query("SELECT * FROM orders o WHERE o.status = 'open'");
       $activeOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
 
-      return $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
+      $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
+
+      $item = $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
+      $item['total'] = $this->getOrderItemTotalPrice($item['tax'], $item['price'], $item['amount']);
+      return $item;
     } else {
       $orderTotalPrice = $activeOrder['total'] + $orderItemTotalPrice;
       $orderTotalTax = $activeOrder['tax'] + $orderItemTotalTax;
@@ -72,13 +76,19 @@ class OrderItem extends BaseModel
         $existing_item_stmt = $this->db->prepare(
           "UPDATE order_item o
             SET amount = :new_amount, tax = :new_total_tax
-            WHERE product_code = :product_code"
+            WHERE product_code = :product_code
+            RETURNING *"
         );
 
-        return $existing_item_stmt->execute([":new_amount" => $amountsAdded, ":new_total_tax" => $newTotalTax, ":product_code" => $productId]);
+        $existing_item_stmt->execute([":new_amount" => $amountsAdded, ":new_total_tax" => $newTotalTax, ":product_code" => $productId]);
+        $item = $existing_item_stmt->fetch(PDO::FETCH_ASSOC);
+        $item['total'] = $this->getOrderItemTotalPrice($item['tax'], $item['price'], $item['amount']);
+        return $item;
       }
       $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
-      return $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
+      $item = $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
+      $item['total'] = $this->getOrderItemTotalPrice($item['tax'], $item['price'], $item['amount']);
+      return $item;
     }
   }
 
@@ -164,6 +174,11 @@ class OrderItem extends BaseModel
   private function calcOrderItemTotalTax(float $taxPercent, float $unitPrice, int $amount)
   {
     return ($taxPercent / 100) * $unitPrice * $amount;
+  }
+
+  private function getOrderItemTotalPrice(float $totalTax, float $price, int $amount)
+  {
+    return $totalTax + ($price * $amount);
   }
 
   private function verifyStockAvailability(int $productId, array $orderItem)
