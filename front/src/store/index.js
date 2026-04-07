@@ -7,6 +7,6 @@ export const store = configureStore({
   reducer: {
     categories: categoryReducer,
     products: productReducer,
-    orderItem: orderItemReducer
+    orderItems: orderItemReducer
   }
 })

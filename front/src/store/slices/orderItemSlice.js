@@ -36,7 +36,7 @@ export const deleteOrderItem = createAsyncThunk(
 );
 
 const orderItemSlice = createSlice({
-  name: "orderItem",
+  name: "orderItems",
 
   initialState: {
     items: [],
