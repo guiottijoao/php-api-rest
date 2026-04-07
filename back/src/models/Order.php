@@ -24,9 +24,10 @@ class Order extends BaseModel
     $this->validate($data);
 
     $businessCode = parent::generateBusinessCode();
-    $stmt = $this->db->prepare("INSERT INTO orders (total, tax, business_code) VALUES (:total, :tax, :business_code)");
+    $stmt = $this->db->prepare("INSERT INTO orders (total, tax, business_code) VALUES (:total, :tax, :business_code) RETURNING *");
 
-    return $stmt->execute([":total" => (float)$data['total'], ":tax" => (float)$data['tax'], ":business_code" => $businessCode]);
+    $stmt->execute([":total" => (float)$data['total'], ":tax" => (float)$data['tax'], ":business_code" => $businessCode]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
   public function finish($orderId)

@@ -23,14 +23,15 @@ class Product extends BaseModel
   {
     $this->validate($data);
 
-    $stmt = $this->db->prepare("INSERT INTO products (name, amount, price, category_code, business_code) VALUES (:name, :amount, :price, :category_code, :business_code)");
+    $stmt = $this->db->prepare("INSERT INTO products (name, amount, price, category_code, business_code) VALUES (:name, :amount, :price, :category_code, :business_code) RETURNING *");
     $stmt->bindValue(':name', $this->sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':amount', (int)$data['amount']);
     $stmt->bindValue(':price', (float)$data['price']);
     $stmt->bindValue(':category_code', (int)$data['category_code']);
     $stmt->bindValue(':business_code', parent::generateBusinessCode());
 
-    return $stmt->execute();
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
   public function delete($productId)

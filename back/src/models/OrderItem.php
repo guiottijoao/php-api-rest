@@ -77,7 +77,8 @@ class OrderItem extends BaseModel
 
         return $existing_item_stmt->execute([":new_amount" => $amountsAdded, ":new_total_tax" => $newTotalTax, ":product_code" => $productId]);
       }
-      return $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
+      $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
+      return $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
     }
   }
 

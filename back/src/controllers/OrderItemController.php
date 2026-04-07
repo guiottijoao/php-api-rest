@@ -53,7 +53,7 @@ class OrderItemController
 
       if ($result) {
         http_response_code(201);
-        echo json_encode(["message" => "Order item created successfully."]);
+        echo json_encode(["message" => "Order item created successfully.", "data" => $result]);
       } else {
         throw new Exception("Cannot process order item data.", 400);
       }

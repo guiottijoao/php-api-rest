@@ -53,7 +53,7 @@ class OrderController
 
       if ($result) {
         http_response_code(200);
-        echo json_encode(["message" => "Order created successfully."]);
+        echo json_encode(["message" => "Order created successfully.", "data" => $result]);
       } else {
         throw new Exception("Cannot process order data.", 400);
       }
