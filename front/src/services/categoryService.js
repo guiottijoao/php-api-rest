@@ -3,7 +3,10 @@ const BASE_URL = "http://localhost";
 export const categoryService = {
   async getAll() {
     const response = await fetch(`${BASE_URL}/categories`);
-    if (!response.ok) throw new Error("Failed to fetch categories.");
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
     return response.json();
   },
 
@@ -15,15 +18,18 @@ export const categoryService = {
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error)
+      throw new Error(error.message);
     }
-    return response.json()
+    return response.json();
   },
 
   async delete(id) {
     const response = await fetch(`${BASE_URL}/categories/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Failed to delete category.");
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
   },
 };
