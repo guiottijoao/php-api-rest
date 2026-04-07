@@ -35,10 +35,10 @@ class CategoryController
       header('Content-Type: applicatio/json');
 
       $input = json_decode(file_get_contents("php://input"), true);
-      
+
       if (!$input) throw new Exception("Required fields not filled.");
 
-      foreach($input as $field => $value) {
+      foreach ($input as $field => $value) {
         if ($value === null || $value === '') {
           throw new Exception("Field $field is required.", 400);
         }
@@ -47,9 +47,9 @@ class CategoryController
       $model = new Category($this->db);
       $result = $model->save($input);
 
-      if ($result === true) {
+      if ($result) {
         http_response_code(201);
-        echo json_encode(["message" => "Category created successfully."]);
+        echo json_encode(["message" => "Category created successfully.", "data" => $result]);
       } else {
         throw new Exception("Cannot process category data.", 400);
       }

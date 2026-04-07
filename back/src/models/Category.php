@@ -26,12 +26,13 @@ class Category extends BaseModel
     $this->validate($data);
     $businessCode = parent::generateBusinessCode();
 
-    $stmt = $this->db->prepare("INSERT INTO categories (name, tax, business_code) VALUES (:name, :tax, :business_code)");
+    $stmt = $this->db->prepare("INSERT INTO categories (name, tax, business_code) VALUES (:name, :tax, :business_code) RETURNING *");
     $stmt->bindValue(':name', parent::sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':tax', (float)$data['tax']);
     $stmt->bindValue(':business_code', $businessCode);
 
-    return $stmt->execute();
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
   public function delete($categoryId)
