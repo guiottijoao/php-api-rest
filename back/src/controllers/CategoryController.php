@@ -39,7 +39,7 @@ class CategoryController
       if (!$input) throw new Exception("Required fields not filled.");
 
       foreach($input as $field => $value) {
-        if (empty($value)) {
+        if ($value === null || $value === '') {
           throw new Exception("Field $field is required.", 400);
         }
       }
