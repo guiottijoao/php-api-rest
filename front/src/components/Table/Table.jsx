@@ -1,25 +1,36 @@
 import styles from "./Table.module.css";
 
-function Table({ data, columns, onDelete }) {
+function Table({ data, columns, onDelete, associatedRegister, findName }) {
   return (
     <div className={styles.tableContainer}>
       <table>
         <thead>
           <tr>
-            {columns.map(col => (
-              <th key={col.key} >{col.label}</th>
+            {columns.map((col) => (
+              <th key={col.key}>{col.label}</th>
             ))}
             <th>Actions</th>
           </tr>
         </thead>
-        
+
         <tbody id="categories-table-body">
           {data.map((row, index) => (
             <tr key={index}>
-              {columns.map(col => (
-                <td key={col.key}>{row[col.key]}</td>
-              ))}
-              <td ><button onClick={() => onDelete(row['code'])} className='delete-btn'>Delete</button></td>
+              {columns.map((col) =>
+                col.key === "category_code" ? (
+                  <td key={col.key}>{findName(row[col.key], associatedRegister)}</td>
+                ) : (
+                  <td key={col.key}>{row[col.key]}</td>
+                ),
+              )}
+              <td>
+                <button
+                  onClick={() => onDelete(row["code"])}
+                  className="delete-btn"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
