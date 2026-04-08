@@ -1,8 +1,9 @@
 import { useSelector } from "react-redux";
 
-
-function OrderSummary({ onCancel }) {
-  const activeOrder = useSelector(state => state.orders.items.find(o => o.status === 'open'))
+function OrderSummary({ onFinish, onCancel }) {
+  const activeOrder = useSelector((state) =>
+    state.orders.items.find((o) => o.status === "open"),
+  );
 
   return (
     <div className="summary">
@@ -17,7 +18,7 @@ function OrderSummary({ onCancel }) {
 
       <form className="actions">
         <button
-        type="button"
+          type="button"
           onClick={() => onCancel(activeOrder?.code)}
           className="cancel-btn"
           id="cancel-btn"
@@ -25,8 +26,8 @@ function OrderSummary({ onCancel }) {
           Cancel
         </button>
         <button
-          // onclick="return confirm('Finish order?')"
-          // formaction="actions/orders/finishOrder.php"
+          type="button"
+          onClick={() => onFinish(activeOrder.code)}
           id="finish-btn"
         >
           Finish

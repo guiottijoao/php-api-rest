@@ -14,14 +14,25 @@ export const fetchOrders = createAsyncThunk(
 
 export const cancelOrder = createAsyncThunk(
   "orders/cancel",
-  async (id, {rejectWithValue}) => {
+  async (id, { rejectWithValue }) => {
     try {
-      return await orderService.update(id)
+      return await orderService.cancelUpdate(id);
     } catch (error) {
-      return rejectWithValue(error.message)
+      return rejectWithValue(error.message);
     }
-  }
-)
+  },
+);
+
+export const finishOrder = createAsyncThunk(
+  "orders/finish",
+  async (id, { rejectWithValue }) => {
+    try {
+      return await orderService.finishUpdate(id);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
 
 const orderSlice = createSlice({
   name: "orders",
@@ -53,19 +64,31 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(cancelOrder.pending, (state) => {
-        state.loading = true
-        state.error = null
+        state.loading = true;
+        state.error = null;
       })
       .addCase(cancelOrder.fulfilled, (state, action) => {
-        state.loading = false
-        state.items = state.items.filter(o => o.code !== action.payload)
+        state.loading = false;
+        state.items = state.items.filter((o) => o.code !== action.payload);
       })
       .addCase(cancelOrder.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
+        state.loading = false;
+        state.error = action.payload;
       })
+      .addCase(finishOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(finishOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = state.items.filter((o) => o.code !== action.payload);
+      })
+      .addCase(finishOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export const { clearError } = orderSlice.actions;
-export default orderSlice.reducer
+export default orderSlice.reducer;

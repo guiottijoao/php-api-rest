@@ -3,9 +3,13 @@ import Form from "../components/Form/Form.jsx";
 import Table from "../components/Table/Table.jsx";
 import OrderSumary from "../components/OrderSummary/OrderSummary.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { fetchCategories } from "../store/slices/categorySlice.js";
-import { fetchOrders, cancelOrder } from "../store/slices/orderSlice.js";
+import {
+  fetchOrders,
+  cancelOrder,
+  finishOrder,
+} from "../store/slices/orderSlice.js";
 import { fetchProducts, getProductById } from "../store/slices/productSlice.js";
 import {
   createOrderItem,
@@ -53,10 +57,6 @@ function Products() {
     (state) => state.products,
   );
 
-  const { items: orders, loading: ordersLoading } = useSelector(
-    (state) => state.orders,
-  );
-
   const {
     items: orderItems,
     loading: orderItemsLoading,
@@ -69,10 +69,14 @@ function Products() {
     dispatch(fetchOrderItems());
     dispatch(fetchOrders());
   }, [dispatch]);
-  
+
   const activeCategories = categories.filter((c) => c.status === "active");
   const activeProducts = products.filter((p) => p.status === "active");
-  
+  const activeOrderItems = useMemo(
+    () => orderItems.filter((o) => o.order_status === "open"),
+    [orderItems],
+  );
+
   const columns = [
     { key: "business_code", label: "Code" },
     { key: "product_code", label: "Product" },
@@ -81,16 +85,11 @@ function Products() {
     { key: "tax", label: "Tax", format: "currency" },
     { key: "total", label: "Total", format: "currency" },
   ];
-  
-  if (
-    ordersLoading ||
-    productsLoading ||
-    categoriesLoading ||
-    orderItemsLoading
-  )
+
+  if (productsLoading || categoriesLoading || orderItemsLoading)
     return <p>Loading...</p>;
 
-    const handleGetProduct = async (id) => {
+  const handleGetProduct = async (id) => {
     const result = await dispatch(getProductById(id));
     if (getProductById.fulfilled.match(result)) {
       dispatch(clearError());
@@ -110,7 +109,8 @@ function Products() {
     }
     if (createOrderItem.fulfilled.match(result)) {
       setForm({ amount: "", product_code: "", price: "", tax: "" });
-      dispatch(fetchOrders())
+      dispatch(fetchOrders());
+      dispatch(fetchOrderItems());
       dispatch(clearError());
     }
   };
@@ -126,7 +126,7 @@ function Products() {
 
     if (result.isConfirmed) {
       const action = await dispatch(deleteOrderItem(id));
-      dispatch(fetchOrders())
+      dispatch(fetchOrders());
 
       if (deleteOrderItem.rejected.match(action)) {
         Swal.fire({
@@ -139,6 +139,7 @@ function Products() {
   };
 
   const handleCancelOrder = async (id) => {
+    if (!orderItems.length) return;
     const result = await Swal.fire({
       title: "Cancel order?",
       icon: "warning",
@@ -149,8 +150,33 @@ function Products() {
 
     if (result.isConfirmed) {
       const action = await dispatch(cancelOrder(id));
-      dispatch(fetchOrderItems())
-      dispatch(fetchOrders())
+      dispatch(fetchOrderItems());
+      dispatch(fetchOrders());
+
+      if (cancelOrder.rejected.match(action)) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: action.payload,
+        });
+      }
+    }
+  };
+
+  const handleFinishOrder = async (id) => {
+    if (!orderItems.length) return;
+    const result = await Swal.fire({
+      title: "Finish order?",
+      icon: "success",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      const action = await dispatch(finishOrder(id));
+      dispatch(fetchOrderItems());
+      dispatch(fetchOrders());
 
       if (cancelOrder.rejected.match(action)) {
         Swal.fire({
@@ -185,12 +211,15 @@ function Products() {
             findName={findNameById}
             products={activeProducts}
             categories={activeCategories}
-            data={orderItems}
+            data={activeOrderItems}
             columns={columns}
             onDelete={handleDeleteOrderItem}
           />
 
-          <OrderSumary onCancel={(id) => handleCancelOrder(id)} />
+          <OrderSumary
+            onCancel={(id) => handleCancelOrder(id)}
+            onFinish={(id) => handleFinishOrder(id)}
+          />
         </section>
       </main>
     </div>

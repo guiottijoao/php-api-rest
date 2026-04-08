@@ -10,7 +10,7 @@ export const orderService = {
     return response.json();
   },
 
-  async update(id) {
+  async cancelUpdate(id) {
     const response = await fetch(`${BASE_URL}/cancel-order/${id}`, {
       method: "PUT",
       headers: { "Content-type": "application/json" },
@@ -20,4 +20,15 @@ export const orderService = {
       throw new Error(error.message);
     }
   },
+
+  async finishUpdate(id) {
+    const response = await fetch(`${BASE_URL}/finish-order/${id}`, {
+      method: "PUT",
+      headers: { "Content-type": "application/json" },
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message)
+    }
+  }
 };
