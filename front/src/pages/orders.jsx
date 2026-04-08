@@ -4,14 +4,14 @@ import Table from "../components/Table/Table.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { fetchCategories } from "../store/slices/categorySlice.js";
-import { fetchProducts } from "../store/slices/productSlice.js";
+import { fetchProducts, getProductById } from "../store/slices/productSlice.js";
 import {
   createOrderItem,
   fetchOrderItems,
   deleteOrderItem,
   clearError,
 } from "../store/slices/orderItemSlice.js";
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 function Products() {
   const dispatch = useDispatch();
@@ -20,26 +20,22 @@ function Products() {
     { name: "amount", type: "number", placeholder: "Amount" },
     {
       name: "tax",
-      type: "number",
+      type: "text",
       placeholder: "Category name",
-      step: "0.01",
-      min: "0",
-      max: "100",
-      placeholder: "tax",
+      placeholder: "Tax",
     },
     {
       name: "price",
-      type: "number",
+      type: "text",
       placeholder: "Price",
-      step: "0.01",
-      min: "0.1",
-      max: "10000000000",
     },
   ];
 
   const [form, setForm] = useState({
-    amount: "",
-    product_code: "",
+    amount: null,
+    product_code: null,
+    price: null,
+    tax: null
   });
 
   useEffect(() => {
@@ -78,6 +74,14 @@ function Products() {
   if (productsLoading || categoriesLoading || orderItemsLoading)
     return <p>Loading...</p>;
 
+  const handleGetProduct = async (id) => {
+    const result = await dispatch(getProductById(id));
+    if (getProductById.fulfilled.match(result)) {
+      dispatch(clearError());
+    }
+    return result.payload
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await dispatch(createOrderItem(form));
@@ -89,7 +93,7 @@ function Products() {
       });
     }
     if (createOrderItem.fulfilled.match(result)) {
-      setForm({ amount: "", product_code: "" });
+      setForm({ amount: "", product_code: "", price: "", tax: "" });
       dispatch(clearError());
     }
   };
@@ -127,7 +131,9 @@ function Products() {
           setForm={setForm}
           page={"orders"}
           btnLabel="Add to order"
-          associatedRegister={activeProducts}
+          products={activeProducts}
+          categories={activeCategories}
+          getProduct={handleGetProduct}
         />
 
         <hr />
@@ -135,7 +141,8 @@ function Products() {
         <section className="productSection">
           <Table
             // findName={findNameById}
-            associatedRegister={activeProducts}
+            products={activeProducts}
+            categories={activeCategories}
             data={activeOrderItems}
             columns={columns}
             onDelete={handleDeleteOrderItem}

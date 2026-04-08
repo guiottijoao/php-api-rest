@@ -1,18 +1,64 @@
 import styles from "./Form.module.css";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
-function Form({ formFields, onSubmit, form, setForm, page, btnLabel, associatedRegister }) {
-  const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+function Form({
+  formFields,
+  onSubmit,
+  form,
+  setForm,
+  page,
+  btnLabel,
+  categories,
+  products,
+  getProduct,
+}) {
+  const selectedProduct = useSelector(
+    (state) => state.products.selectedItem,
+  );
+
+  const formatDisabledFields = (field, value) => {
+    return field === 'price' ? `Unit price: $${value}` : `Tax: ${value}%`
+  }
+
+  const handleChange = async (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.type === 'number' ? Number(e.target.value) : e.target.value }));
+    if (e.target.name === "product_code") {
+      await getProduct(e.target.value);
+    }
   };
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setForm((prev) => ({ ...prev, price: selectedProduct.price, tax: selectedProduct.tax }));
+    }
+  }, [selectedProduct]);
 
   return (
     <div className={styles.formWrapper}>
       <form onSubmit={onSubmit}>
+        {/* Product selector (Orders page) */}
+        {page === "orders" && (
+          <select
+            value={form.product_code}
+            onChange={handleChange}
+            name="product_code"
+            id="product-selector"
+          >
+            <option disabled value="">
+              Select a product
+            </option>
+            {products.map((item) => (
+              <option key={item.code} value={item.code}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        )}
         <div className={styles.formFields}>
-          {/* Layout: if the form is on page products there is a wrapper and the 'name' field is outside this wrapper */}
           {formFields.map(
             (field, index) =>
-              (field.name === "name" || page !== "products") && (
+              (field.name === "name" || page === "categories") && (
                 <input
                   onChange={handleChange}
                   value={form[field.name]}
@@ -26,8 +72,41 @@ function Form({ formFields, onSubmit, form, setForm, page, btnLabel, associatedR
                 />
               ),
           )}
+
+          {/* ORDERS Page fields */}
+          {formFields.map(
+            (field, index) =>
+              page === "orders" &&
+              field.name === "amount" && (
+                <input
+                  onChange={handleChange}
+                  value={form[field.name]}
+                  key={index}
+                  type={field.type}
+                  name={field.name}
+                  placeholder={field.placeholder}
+                />
+              ),
+          )}
+
+          {formFields.map(
+            (field, index) =>
+              page === "orders" &&
+              (field.name === "tax" || field.name === "price") && (
+                <input
+                  onChange={handleChange}
+                  value={formatDisabledFields(field.name, form[field.name])}
+                  key={index}
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  name={field.name}
+                  disabled
+                />
+              ),
+          )}
         </div>
 
+        {/* Products page */}
         {page === "products" && (
           <div className={styles.fieldsWrapper}>
             {formFields.map(
@@ -46,11 +125,22 @@ function Form({ formFields, onSubmit, form, setForm, page, btnLabel, associatedR
                   />
                 ),
             )}
-            <select defaultValue="" onChange={handleChange} name="category_code" id="category-selector">
-              <option disabled value="">Select a category</option>
-              {associatedRegister.map(item => 
-              <option key={item.code} value={item.code}>{item.name}</option>
-              )}
+
+            {/* Categorias selector (Products page) */}
+            <select
+              defaultValue=""
+              onChange={handleChange}
+              name="category_code"
+              id="category-selector"
+            >
+              <option disabled value="">
+                Select a category
+              </option>
+              {categories.map((item) => (
+                <option key={item.code} value={item.code}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </div>
         )}
