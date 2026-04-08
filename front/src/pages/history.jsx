@@ -22,13 +22,15 @@ function History() {
     dispatch(fetchOrders())
   }, [dispatch])
 
+  if (ordersLoading) return <p>Loading</p>
+
   const historyOrders = orders.filter((o) => o.status === 'closed')
 
   return (
-    <div class="container">
+    <div className="container">
       <PageTitle title={"History"} />
-      <main class="main-content" id="history-content">
-        <HistoryTable order={historyOrders} />
+      <main className="main-content" id="history-content">
+        <HistoryTable orders={historyOrders} />
 
         <HistoryModal />
       </main>
