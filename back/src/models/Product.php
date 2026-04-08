@@ -22,12 +22,15 @@ class Product extends BaseModel
 
   public function findById($id)
   {
-    $result = parent::findById($id);
+    $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE code = :id");
+    $stmt->execute([':id' => $id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$result) {
       throw new Exception("Product not found.", 404);
     }
+    $result['tax'] = $this->getTaxById($result['code']);
     return $result;
-  }
+    }
 
   public function save($data)
   {
