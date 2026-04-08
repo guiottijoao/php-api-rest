@@ -5,7 +5,7 @@ export default function formatField(col, value) {
     case "percent":
       return `${formatNumeric(value)}%`
     case "currency":
-      return `$${value}`;
+      return `$${Number(value).toFixed(2)}`;
     default:
       return value;
   }
