@@ -1,27 +1,28 @@
-function HistoryTable() {
+import styles from './HistoryTable.module.css'
+
+function HistoryTable({ orders }) {
   return (
-    <div class="table-container">
+    <div className="table-container">
       <table>
-        <tr>
-          <th>Code</th>
-          <th>Tax</th>
-          <th>Total</th>
-          <th>Product details</th>
-        </tr>
-        <tbody id="history-table-body">
+        <tbody>
           <tr>
-            <td>code</td>
-            <td>$tax</td>
-            <td>$total</td>
-            <td>
-              <a
-                onclick="openOrderModal('<?= $order['code'] ?>')"
-                class="view-btn"
-              >
-                View
-              </a>
-            </td>
+            <th>Code</th>
+            <th>Tax</th>
+            <th>Total</th>
+            <th>Product details</th>
           </tr>
+        </tbody>
+        <tbody id="history-table-body">
+          {orders.map((o) => (
+            <tr key={o.code}>
+              <td>{o.code}</td>
+              <td>${o.tax}</td>
+              <td>${o.total}</td>
+              <td>
+                <a className={styles.viewBtn}>View</a>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
