@@ -118,7 +118,7 @@ function Products() {
           setForm={setForm}
           page={"products"}
           btnLabel="Add product"
-          associatedRegister={activeCategories}
+          categories={activeCategories}
         />
 
         <hr />
@@ -126,7 +126,7 @@ function Products() {
         <section className="productSection">
           <Table
             findName={findNameById}
-            associatedRegister={activeCategories}
+            categories={activeCategories}
             data={activeProducts}
             columns={columns}
             onDelete={handleDeleteProduct}
