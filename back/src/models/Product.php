@@ -10,6 +10,16 @@ class Product extends BaseModel
     $this->db = $db;
   }
 
+  public function list()
+  {
+    $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($items as $index => $i) {
+      $items[$index]['tax'] = $this->getTaxById($i['code']);
+    }
+    return $items;
+  }
+
   public function findById($id)
   {
     $result = parent::findById($id);
@@ -90,5 +100,17 @@ class Product extends BaseModel
     if (!$verify_fk_existence->fetchColumn()) {
       throw new Exception("Category does not exist.");
     }
+  }
+
+  private function getTaxById(int $id)
+  {
+    $stmt = $this->db->prepare(
+    "SELECT c.tax FROM categories c
+    INNER JOIN products p ON
+    c.code = p.category_code
+    WHERE p.code = :code"
+    );
+    $stmt->execute([":code" => $id]);
+    return $stmt->fetchColumn();
   }
 }
