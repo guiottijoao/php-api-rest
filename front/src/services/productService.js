@@ -10,6 +10,15 @@ export const productService = {
     return response.json();
   },
 
+  async getById(id) {
+    const response = await fetch(`${BASE_URL}/products/${id}`)
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message)
+    }
+    return response.json()
+  },
+
   async store(data) {
     const response = await fetch(`${BASE_URL}/products`, {
       method: "POST",
