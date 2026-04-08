@@ -13,13 +13,23 @@ class OrderItem extends BaseModel
   public function list()
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+    $order_stmt = $this->db->prepare(
+      "SELECT o.status FROM orders o
+    INNER JOIN order_item oi
+    ON o.code = oi.order_code
+    WHERE oi.code = :code
+    "
+    );
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($items as $index => $i) {
       $items[$index]['total'] = $this->getOrderItemTotalPrice(
         $i['tax'],
         $i['price'],
-        $i['amount']
-      );
+        $i['amount'],
+        );
+        $order_stmt->execute([":code" => $i['code']]);
+        $order_status = $order_stmt->fetchColumn();
+        $items[$index]['order_status'] = $order_status;
     }
     return $items;
   }
