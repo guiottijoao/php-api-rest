@@ -215,7 +215,7 @@ class OrderItem extends BaseModel
       if ($product['amount'] === 0) {
         throw new Exception("This product is out of stock.");
       }
-      throw new Exception("This product has only " . (int)$product['amount'] . " itens in stock.");
+      throw new Exception("This product has only " . (int)$product['amount'] . " items in stock.");
     }
     return true;
   }
