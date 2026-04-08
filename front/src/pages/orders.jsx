@@ -16,6 +16,11 @@ import Swal from "sweetalert2";
 function Products() {
   const dispatch = useDispatch();
 
+  const findNameById = (id, data) => {
+    const found = data.find((c) => c.code == id);
+    return found?.name;
+  };
+
   const formFields = [
     { name: "amount", type: "number", placeholder: "Amount" },
     {
@@ -32,10 +37,10 @@ function Products() {
   ];
 
   const [form, setForm] = useState({
-    amount: null,
-    product_code: null,
-    price: null,
-    tax: null
+    amount: "",
+    product_code: "",
+    price: "",
+    tax: ""
   });
 
   useEffect(() => {
@@ -43,25 +48,24 @@ function Products() {
     dispatch(fetchProducts());
     dispatch(fetchOrderItems());
   }, [dispatch]);
-
+  
   const { items: categories, loading: categoriesLoading } = useSelector(
     (state) => state.categories,
   );
-
+  
   const { items: products, loading: productsLoading } = useSelector(
     (state) => state.products,
   );
-
+  
   const {
     items: orderItems,
     loading: orderItemsLoading,
     error,
   } = useSelector((state) => state.orderItems);
-
+  
   const activeCategories = categories.filter((c) => c.status === "active");
   const activeProducts = products.filter((p) => p.status === "active");
-  const activeOrderItems = orderItems.filter((o) => o.status === "active");
-
+  
   const columns = [
     { key: "business_code", label: "Code" },
     { key: "product_code", label: "Product" },
@@ -140,10 +144,10 @@ function Products() {
 
         <section className="productSection">
           <Table
-            // findName={findNameById}
+            findName={findNameById}
             products={activeProducts}
             categories={activeCategories}
-            data={activeOrderItems}
+            data={orderItems}
             columns={columns}
             onDelete={handleDeleteOrderItem}
           />
