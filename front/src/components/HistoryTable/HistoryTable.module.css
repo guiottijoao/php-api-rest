@@ -1,0 +1,12 @@
+.viewBtn {
+  background-color: #6a65ff;
+  text-decoration: none;
+  color: black;
+  border: none;
+  transition: ease-in-out 100ms;
+  padding: 0.5rem;
+}
+
+.viewBtn:hover {
+  background-color: #514cdb;
+}

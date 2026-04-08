@@ -1,20 +1,24 @@
+import styles from './HistoryModal.module.css'
+
 function HistoryModal() {
   return (
-    <dialog id="order-products-modal">
+    <dialog id={styles.orderProductsModal}>
       <nav>
-        <h3 class="order-details-title">Order itens</h3>
-        <div id="close-modal-btn">
+        <h3 className={styles.OrderDetailsTitle}>Order itens</h3>
+        <div id={styles.closeModalBtn}>
           <p>X</p>
         </div>
       </nav>
-      <table class="order-products-table">
-        <tr>
-          <th>Name</th>
-          <th>Amount</th>
-          <th>Unit Price</th>
-          <th>Total tax</th>
-        </tr>
-        <tbody id="order-products-table-content"></tbody>
+      <table className={styles.orderProductsTable}>
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Unit Price</th>
+            <th>Total tax</th>
+          </tr>
+        </tbody>
+        <tbody id={styles.orderProductsTableContent}></tbody>
       </table>
     </dialog>
   );

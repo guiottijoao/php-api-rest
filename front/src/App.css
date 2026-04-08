@@ -124,3 +124,9 @@ tr:hover .action-cell {
 #finish-btn:hover {
   background-color: #5854d6;
 }
+
+#history-content {
+  display: flex;
+  flex-direction: column;
+}
+

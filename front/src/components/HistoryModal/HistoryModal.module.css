@@ -1,0 +1,51 @@
+#orderProductsModal {
+  position: absolute;
+  padding: 1rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgb(146, 146, 146);
+  border-radius: 0.5rem;
+  box-shadow:
+    rgba(81, 81, 136, 0.25) 0px 13px 27px -5px,
+    rgba(161, 161, 161, 0.3) 0px 8px 16px -8px;
+}
+
+#orderProductsModal > nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+#orderProductsModal > nav > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.25rem;
+  transition: 100ms ease-in-out;
+  border-radius: 0.5rem;
+}
+
+#orderProductsModal > nav > div:hover {
+  background-color: #a7a7a7;
+}
+
+#orderProductsModal > nav > div > p {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.orderDetailsTitle {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.orderProductsTable {
+  margin: 0;
+}
+
+td,
+th {
+  padding: 1rem;
+}
