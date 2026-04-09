@@ -107,11 +107,11 @@ function Form({
             <option disabled value="">
               Select a product
             </option>
-            {products.map((item) => (
+            {products.map((item) => item.amount > 0 ? (
               <option key={item.code} value={item.code}>
                 {item.name}
               </option>
-            ))}
+            ) : null)}
           </ProtectedSelector>
         )}
         <div className={styles.formFields}>
