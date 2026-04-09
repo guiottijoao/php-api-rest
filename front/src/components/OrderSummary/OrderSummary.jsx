@@ -9,10 +9,10 @@ function OrderSummary({ onFinish, onCancel }) {
     <div className="summary">
       <div className="summary-values">
         <div className="summary-info">
-          <p id="total-order-tax">Tax: ${activeOrder?.tax} </p>
+          <p id="total-order-tax">Tax: ${activeOrder?.tax ? activeOrder?.tax : '0.00'} </p>
         </div>
         <div className="summary-info">
-          <p id="total-order-price">Total: ${activeOrder?.total} </p>
+          <p id="total-order-price">Total: ${activeOrder?.total ? activeOrder?.total : '0.00'} </p>
         </div>
       </div>
 
@@ -27,7 +27,7 @@ function OrderSummary({ onFinish, onCancel }) {
         </button>
         <button
           type="button"
-          onClick={() => onFinish(activeOrder.code)}
+          onClick={() => onFinish(activeOrder?.code)}
           id="finish-btn"
         >
           Finish
