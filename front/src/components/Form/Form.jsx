@@ -25,6 +25,37 @@ function ProtectedInput({ type, ...props }) {
   return <input ref={inputRef} type={type} {...props} />;
 }
 
+function ProtectedSelector({ children, ...props }) {
+  const selectRef = useRef(null);
+
+  useEffect(() => {
+    const select = selectRef.current;
+
+    const selectorObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              node.remove();
+            }
+          });
+        }
+      });
+    });
+    selectorObserver.observe(select, {
+      childList: true,
+    });
+  
+    return () => selectorObserver.disconnect()
+  }, []);
+
+  return (
+    <select ref={selectRef} {...props}>
+      {children}
+    </select>
+  )
+}
+
 function Form({
   formFields,
   onSubmit,
@@ -67,7 +98,7 @@ function Form({
       <form onSubmit={onSubmit}>
         {/* Product selector (Orders page) */}
         {page === "orders" && (
-          <select
+          <ProtectedSelector
             value={form.product_code}
             onChange={handleChange}
             name="product_code"
@@ -81,7 +112,7 @@ function Form({
                 {item.name}
               </option>
             ))}
-          </select>
+          </ProtectedSelector>
         )}
         <div className={styles.formFields}>
           {formFields.map(
@@ -155,7 +186,7 @@ function Form({
             )}
 
             {/* Categorias selector (Products page) */}
-            <select
+            <ProtectedSelector
               defaultValue=""
               onChange={handleChange}
               name="category_code"
@@ -169,7 +200,7 @@ function Form({
                   {item.name}
                 </option>
               ))}
-            </select>
+            </ProtectedSelector>
           </div>
         )}
         <button className={styles.submitBtn} type="submit">
