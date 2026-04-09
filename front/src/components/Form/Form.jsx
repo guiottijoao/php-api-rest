@@ -45,15 +45,15 @@ function ProtectedSelector({ children, ...props }) {
     selectorObserver.observe(select, {
       childList: true,
     });
-  
-    return () => selectorObserver.disconnect()
+
+    return () => selectorObserver.disconnect();
   }, []);
 
   return (
     <select ref={selectRef} {...props}>
       {children}
     </select>
-  )
+  );
 }
 
 function Form({
@@ -84,14 +84,14 @@ function Form({
   };
 
   useEffect(() => {
-    if (selectedProduct) {
+    if (selectedProduct && form.product_code) {
       setForm((prev) => ({
         ...prev,
         price: selectedProduct.price,
         tax: selectedProduct.tax,
       }));
     }
-  }, [selectedProduct]);
+  }, [selectedProduct, form.product_code]);
 
   return (
     <div className={styles.formWrapper}>
@@ -149,13 +149,13 @@ function Form({
           )}
 
           {formFields.map(
-            (field, index) =>
+            (field) =>
               page === "orders" &&
               (field.name === "tax" || field.name === "price") && (
                 <ProtectedInput
                   onChange={handleChange}
                   value={formatDisabledFields(field.name, form[field.name])}
-                  key={index}
+                  key={field.name}
                   type={field.type}
                   placeholder={field.placeholder}
                   name={field.name}
