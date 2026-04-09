@@ -78,7 +78,6 @@ function Products() {
   );
 
   const columns = [
-    { key: "business_code", label: "Code" },
     { key: "product_code", label: "Product" },
     { key: "amount", label: "Amount" },
     { key: "price", label: "Unit price", format: "currency" },
