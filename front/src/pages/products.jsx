@@ -22,7 +22,7 @@ function Products() {
 
   const formFields = [
     { name: "name", type: "text", placeholder: "Product name" },
-    { name: "amount", type: "number", placeholder: "Amount" },
+    { name: "amount", min: "1", step: "1", type: "number", placeholder: "Amount" },
     {
       name: "price",
       type: "number",
