@@ -69,7 +69,7 @@ class Category extends BaseModel
     }
 
     if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)  || !preg_match('/\p{L}/u', $name)) {
-      throw new Exception("Name contains invalid characters.", 400);
+      throw new Exception("Name can't contain special characters or be only numbers.", 400);
     }
 
     if (!is_numeric($tax) || $tax < 0 || $tax > 100) {
