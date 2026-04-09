@@ -9,6 +9,9 @@ import { fetchOrderItems } from "../store/slices/orderItemSlice";
 function History() {
   const dispatch = useDispatch();
 
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState(null)
+
   const { items: orders, loading: ordersLoading } = useSelector(
     (state) => state.orders,
   );
@@ -16,6 +19,16 @@ function History() {
   const {items: orderItems, loading: orderItemsLoading} = useSelector(
     (state) => state.orderItems
   )
+
+  const handleOpenModal = (id) => {
+    setModalOpen(true)
+    setSelectedId(id)
+  }
+
+  const handleCloseModal = () => {
+    setModalOpen(false)
+    setSelectedId(null)
+  }
 
   useEffect(() => {
     dispatch(fetchOrderItems())
@@ -30,9 +43,9 @@ function History() {
     <div className="container">
       <PageTitle title={"History"} />
       <main className="main-content" id="history-content">
-        <HistoryTable orders={historyOrders} />
+        <HistoryTable orders={historyOrders} onSetModal={(id) => handleOpenModal(id)} />
 
-        <HistoryModal />
+        <HistoryModal orders={historyOrders} isModalOpen={isModalOpen} selectedId={selectedId} onCloseModal={handleCloseModal} />
       </main>
     </div>
   );

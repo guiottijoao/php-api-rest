@@ -1,6 +1,6 @@
 import styles from './HistoryTable.module.css'
 
-function HistoryTable({ orders }) {
+function HistoryTable({ orders, onSetModal }) {
   return (
     <div className="table-container">
       <table>
@@ -19,7 +19,7 @@ function HistoryTable({ orders }) {
               <td>${o.tax}</td>
               <td>${o.total}</td>
               <td>
-                <a className={styles.viewBtn}>View</a>
+                <a onClick={() => onSetModal(o.code)} className={styles.viewBtn}>View</a>
               </td>
             </tr>
           ))}
