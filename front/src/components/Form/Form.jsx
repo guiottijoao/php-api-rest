@@ -187,7 +187,7 @@ function Form({
 
             {/* Categorias selector (Products page) */}
             <ProtectedSelector
-              defaultValue=""
+              value={form.category_code}
               onChange={handleChange}
               name="category_code"
               id="category-selector"
