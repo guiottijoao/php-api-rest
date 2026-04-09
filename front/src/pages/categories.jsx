@@ -56,7 +56,7 @@ function Categories() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: result.payload.message,
+        text: result.payload,
       });
     }
     if (createCategory.fulfilled.match(result)) {
