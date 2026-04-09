@@ -140,7 +140,7 @@ class OrderItem extends BaseModel
 
     if ($product_stmt->rowCount() === 0) throw new Exception("Product doesn't exist.", 404);
 
-    if ($amount < 1 || $amount > 10000 || !is_int($amount)) {
+    if ($amount < 1 || $amount > 10000 || !filter_var($amount, FILTER_VALIDATE_INT)) {
       throw new Exception("Amount must be an integer number between 1 and 10000 (ten thousand).", 400);
     }
 
