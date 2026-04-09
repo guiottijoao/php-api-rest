@@ -82,8 +82,8 @@ class Product extends BaseModel
       throw new Exception("Name cannot exceed 20 characters.");
     }
 
-    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)) {
-      throw new Exception("Name contains invalid characters.");
+    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)  || !preg_match('/\p{L}/u', $name)) {
+      throw new Exception("Name can't contain special characters or be only numbers.");
     }
 
     if ($this->nameExists($name)) {

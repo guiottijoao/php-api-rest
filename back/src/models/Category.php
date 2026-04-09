@@ -68,7 +68,7 @@ class Category extends BaseModel
       throw new Exception("A category with this name already exists.", 409);
     }
 
-    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)) {
+    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)  || !preg_match('/\p{L}/u', $name)) {
       throw new Exception("Name contains invalid characters.", 400);
     }
 
