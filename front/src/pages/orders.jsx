@@ -139,7 +139,7 @@ function Products() {
   };
 
   const handleCancelOrder = async (id) => {
-    if (!orderItems.length) return;
+    if (!activeOrderItems.length) return;
     const result = await Swal.fire({
       title: "Cancel order?",
       icon: "warning",
@@ -164,7 +164,7 @@ function Products() {
   };
 
   const handleFinishOrder = async (id) => {
-    if (!orderItems.length) return;
+    if (!activeOrderItems.length) return;
     const result = await Swal.fire({
       title: "Finish order?",
       icon: "success",
