@@ -4,6 +4,7 @@ import Table from "../components/Table/Table.jsx";
 import OrderSumary from "../components/OrderSummary/OrderSummary.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchCategories } from "../store/slices/categorySlice.js";
 import {
   fetchOrders,
@@ -21,6 +22,7 @@ import Swal from "sweetalert2";
 
 function Products() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const findNameById = (id, data) => {
     const found = data.find((c) => c.code == id);
@@ -184,6 +186,7 @@ function Products() {
           text: action.payload,
         });
       }
+      navigate("/history");
     }
   };
 
