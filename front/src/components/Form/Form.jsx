@@ -1,6 +1,32 @@
 import styles from "./Form.module.css";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+function ProtectedInput({ type, ...props }) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const input = inputRef.current;
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.attributeName === "type" &&
+          input.type !== type
+        ) {
+          input.type = type;
+          input.value = "";
+        }
+      });
+    });
+
+    observer.observe(input, { attributes: true });
+
+    return () => observer.disconnect();
+  }, [type]);
+
+  return <input ref={inputRef} type={type} {...props} />;
+}
 
 function Form({
   formFields,
@@ -13,16 +39,18 @@ function Form({
   products,
   getProduct,
 }) {
-  const selectedProduct = useSelector(
-    (state) => state.products.selectedItem,
-  );
+  const selectedProduct = useSelector((state) => state.products.selectedItem);
 
   const formatDisabledFields = (field, value) => {
-    return field === 'price' ? `Unit price: $${value}` : `Tax: ${value}%`
-  }
+    return field === "price" ? `Unit price: $${value}` : `Tax: ${value}%`;
+  };
 
   const handleChange = async (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.type === 'number' ? Number(e.target.value) : e.target.value }));
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]:
+        e.target.type === "number" ? Number(e.target.value) : e.target.value,
+    }));
     if (e.target.name === "product_code") {
       await getProduct(e.target.value);
     }
@@ -30,7 +58,11 @@ function Form({
 
   useEffect(() => {
     if (selectedProduct) {
-      setForm((prev) => ({ ...prev, price: selectedProduct.price, tax: selectedProduct.tax }));
+      setForm((prev) => ({
+        ...prev,
+        price: selectedProduct.price,
+        tax: selectedProduct.tax,
+      }));
     }
   }, [selectedProduct]);
 
@@ -59,7 +91,7 @@ function Form({
           {formFields.map(
             (field, index) =>
               (field.name === "name" || page === "categories") && (
-                <input
+                <ProtectedInput
                   onChange={handleChange}
                   value={form[field.name]}
                   key={index}
@@ -78,7 +110,7 @@ function Form({
             (field, index) =>
               page === "orders" &&
               field.name === "amount" && (
-                <input
+                <ProtectedInput
                   onChange={handleChange}
                   value={form[field.name]}
                   key={index}
@@ -93,7 +125,7 @@ function Form({
             (field, index) =>
               page === "orders" &&
               (field.name === "tax" || field.name === "price") && (
-                <input
+                <ProtectedInput
                   onChange={handleChange}
                   value={formatDisabledFields(field.name, form[field.name])}
                   key={index}
@@ -112,7 +144,7 @@ function Form({
             {formFields.map(
               (field, index) =>
                 field.name !== "name" && (
-                  <input
+                  <ProtectedInput
                     onChange={handleChange}
                     value={form[field.name]}
                     key={index}
