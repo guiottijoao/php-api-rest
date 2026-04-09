@@ -10,10 +10,7 @@ function ProtectedInput({ type, ...props }) {
 
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (
-          mutation.attributeName === "type" &&
-          input.type !== type
-        ) {
+        if (mutation.attributeName === "type" && input.type !== type) {
           input.type = type;
           input.value = "";
         }
@@ -48,8 +45,7 @@ function Form({
   const handleChange = async (e) => {
     setForm((prev) => ({
       ...prev,
-      [e.target.name]:
-        e.target.type === "number" ? Number(e.target.value) : e.target.value,
+      [e.target.name]: e.target.value,
     }));
     if (e.target.name === "product_code") {
       await getProduct(e.target.value);
