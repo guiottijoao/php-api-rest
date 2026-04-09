@@ -30,6 +30,7 @@ class OrderItem extends BaseModel
         $order_stmt->execute([":code" => $i['code']]);
         $order_status = $order_stmt->fetchColumn();
         $items[$index]['order_status'] = $order_status;
+        $items[$index]['product_name'] = $this->getProductName($i['code']);
     }
     return $items;
   }
@@ -168,6 +169,18 @@ class OrderItem extends BaseModel
   {
     $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM order_item");
     $stmt->execute();
+    return $stmt->fetchColumn();
+  }
+
+  private function getProductName($orderItemId) {
+    $stmt = $this->db->prepare(
+    "SELECT p.name
+    FROM products p
+    INNER JOIN order_item oi
+    ON p.code = oi.product_code
+    WHERE oi.code = :code");
+
+    $stmt->execute([":code" => $orderItemId]);
     return $stmt->fetchColumn();
   }
 
