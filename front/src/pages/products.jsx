@@ -80,7 +80,7 @@ function Products() {
       });
     }
     if (createProduct.fulfilled.match(result)) {
-      setForm((prev) => ({ name: "", amount: "", price: "", category_code: "", product_code: "" }));
+      setForm((prev) => ({ name: "", amount: "", price: "", category_code: "" }));
       dispatch(clearError());
     }
   };
