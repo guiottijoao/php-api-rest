@@ -1,9 +1,9 @@
 <?php
 
-namespace App\controllers;
+namespace App\Controllers;
 
-use App\models\Order;
-use App\exceptions\ApiException;
+use App\Models\Order;
+use App\Exceptions\ApiException;
 use PDO;
 
 class CancelOrderController

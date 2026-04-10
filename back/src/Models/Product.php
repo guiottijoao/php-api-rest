@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
 use App\Exceptions\ApiException;
-use App\Model\BaseModel;
+use App\Models\BaseModel;
 use PDO;
 
 class Product extends BaseModel

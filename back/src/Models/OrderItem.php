@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Models;
 
-use App\Model\BaseModel;
+use App\Models\BaseModel;
 use App\Exceptions\ApiException;
 use PDO;
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\controllers;
+namespace App\Controllers;
 
-use App\exceptions\ApiException;
-use App\models\Product;
+use App\Models\OrderItem;
+use App\Exceptions\ApiException;
 use PDO;
 
-class ProductsController
+class OrderItemController
 {
 
   private $db;
@@ -19,7 +19,7 @@ class ProductsController
   public function index($id = null)
   {
     try {
-      $model = new Product($this->db);
+      $model = new OrderItem($this->db);
       if ($id) {
         $data = $model->findById($id);
       } else {
@@ -43,8 +43,8 @@ class ProductsController
       $input = json_decode(file_get_contents('php://input'), true);
 
       if (!$input) throw new ApiException("Required fields not filled.", 400);
-      if (!isset($input['name'], $input['amount'], $input['price'], $input['category_code'])) {
-        throw new ApiException("Expected fields: 'name', 'amount', 'price', 'category'.");
+      if (!isset($input['product_code'], $input['amount'])) { // os outros campos  são calculados
+        throw new ApiException("Expected fields: 'order', 'product', 'amount', 'price', 'tax'.");
       }
 
       foreach ($input as $field => $value) {
@@ -53,14 +53,14 @@ class ProductsController
         }
       }
 
-      $model = new Product($this->db);
+      $model = new OrderItem($this->db);
       $result = $model->save($input);
 
       if ($result) {
         http_response_code(201);
-        echo json_encode(["message" => "Product created successfully.", "data" => $result]);
+        echo json_encode(["message" => "Order item created successfully.", "data" => $result]);
       } else {
-        throw new ApiException("Cannot process product data.", 400);
+        throw new ApiException("Cannot process order item data.", 400);
       }
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
@@ -69,15 +69,15 @@ class ProductsController
     }
   }
 
-  public function delete($productId)
+  public function delete($orderItemId)
   {
     try {
-      $model = new Product($this->db);
-      if (!$productId) {
+      $model = new OrderItem($this->db);
+      if (!$orderItemId) {
         throw new ApiException("Id not provided.", 400);
       }
 
-      $model->delete($productId);
+      $model->delete($orderItemId);
       http_response_code(204);
     } catch (ApiException $e) {
       $code = (int)$e->getCode();

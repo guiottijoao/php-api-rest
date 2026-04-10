@@ -1,12 +1,12 @@
 <?php
 
-use App\config\Database;
-use App\controllers\CategoryController;
-use App\controllers\ProductsController;
-use App\controllers\OrderItemController;
-use App\controllers\CancelOrderController;
-use App\controllers\FinishOrderController;
-use App\controllers\OrderController;
+use App\Config\Database;
+use App\Controllers\CategoryController;
+use App\Controllers\ProductsController;
+use App\Controllers\OrderItemController;
+use App\Controllers\CancelOrderController;
+use App\Controllers\FinishOrderController;
+use App\Controllers\OrderController;
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\controllers;
+namespace App\Controllers;
 
 use PDO;
-use App\exceptions\ApiException;
-use App\models\Order;
+use App\Exceptions\ApiException;
+use App\Models\Order;
 use Exception;
 
 class OrderController
