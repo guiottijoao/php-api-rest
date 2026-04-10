@@ -29,7 +29,7 @@ class ProductsController
     } catch (ApiException $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 
@@ -63,7 +63,7 @@ class ProductsController
     } catch (ApiException $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 
@@ -80,7 +80,7 @@ class ProductsController
     } catch (ApiException $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 }

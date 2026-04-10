@@ -29,7 +29,7 @@ class CategoryController
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 
@@ -61,7 +61,7 @@ class CategoryController
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
 
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 
@@ -77,7 +77,7 @@ class CategoryController
     } catch (ApiException $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 }

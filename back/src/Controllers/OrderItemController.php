@@ -31,7 +31,7 @@ class OrderItemController
     } catch (ApiException $e) {
       $code = $e->getCode();
       http_response_code($code);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 
@@ -65,7 +65,7 @@ class OrderItemController
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 
@@ -82,7 +82,7 @@ class OrderItemController
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 }
