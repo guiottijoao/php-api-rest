@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Config;
 
@@ -6,9 +7,9 @@ use PDO;
 
 class Database
 {
-  private static $instance = null;
+  private static ?PDO $instance = null;
 
-  public static function getConnection()
+  public static function getConnection(): PDO
   {
     if (!self::$instance) {
       $host = "pgsql_desafio";
