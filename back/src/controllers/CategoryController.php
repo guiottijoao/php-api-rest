@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__ . '/../models/Category.php';
+
+namespace App\controllers;
+
+use App\models\Category;
+use App\exceptions\ApiException;
+use PDO;
 
 class CategoryController
 {
@@ -22,7 +27,7 @@ class CategoryController
       }
       header('Content-Type: application/json');
       echo json_encode($data);
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
       echo json_encode(["message: " => $e->getMessage()]);
@@ -36,11 +41,11 @@ class CategoryController
 
       $input = json_decode(file_get_contents("php://input"), true);
 
-      if (!$input) throw new Exception("Required fields not filled.");
+      if (!$input) throw new ApiException("Required fields not filled.");
 
       foreach ($input as $field => $value) {
         if ($value === null || $value === '') {
-          throw new Exception("Field $field is required.", 400);
+          throw new ApiException("Field $field is required.", 400);
         }
       }
 
@@ -51,9 +56,9 @@ class CategoryController
         http_response_code(201);
         echo json_encode(["message" => "Category created successfully.", "data" => $result]);
       } else {
-        throw new Exception("Cannot process category data.", 400);
+        throw new ApiException("Cannot process category data.", 400);
       }
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
 
@@ -66,11 +71,11 @@ class CategoryController
     try {
       $model = new Category($this->db);
       if (!$categoryId) {
-        throw new Exception("Id not provided.", 400);
+        throw new ApiException("Id not provided.", 400);
       }
       $model->delete($categoryId);
       http_response_code(204);
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
       echo json_encode(["message" => $e->getMessage()]);

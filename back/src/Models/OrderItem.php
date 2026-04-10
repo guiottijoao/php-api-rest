@@ -1,9 +1,9 @@
 <?php
 
-namespace App\models;
+namespace App\Model;
 
-use App\exceptions\ApiException;
-use App\models\BaseModel;
+use App\Model\BaseModel;
+use App\Exceptions\ApiException;
 use PDO;
 
 class OrderItem extends BaseModel

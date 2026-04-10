@@ -1,4 +1,9 @@
 <?php
+
+namespace App\config;
+
+use PDO;
+
 class Database
 {
   private static $instance = null;

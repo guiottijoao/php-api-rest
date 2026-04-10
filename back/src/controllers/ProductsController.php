@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__ . '/../models/Product.php';
+
+namespace App\controllers;
+
+use App\exceptions\ApiException;
+use App\models\Product;
+use PDO;
 
 class ProductsController
 {
@@ -23,7 +28,7 @@ class ProductsController
 
       header('Content-type: application/json');
       echo json_encode($data);
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = $e->getCode();
       http_response_code($code);
       echo json_encode(["message: " => $e->getMessage()]);
@@ -37,14 +42,14 @@ class ProductsController
 
       $input = json_decode(file_get_contents('php://input'), true);
 
-      if (!$input) throw new Error("Required fields not filled.", 400);
+      if (!$input) throw new ApiException("Required fields not filled.", 400);
       if (!isset($input['name'], $input['amount'], $input['price'], $input['category_code'])) {
-        throw new Exception("Expected fields: 'name', 'amount', 'price', 'category'.");
+        throw new ApiException("Expected fields: 'name', 'amount', 'price', 'category'.");
       }
 
       foreach ($input as $field => $value) {
         if (empty($value)) {
-          throw new Exception("Field $field is required", 400);
+          throw new ApiException("Field $field is required", 400);
         }
       }
 
@@ -55,9 +60,9 @@ class ProductsController
         http_response_code(201);
         echo json_encode(["message" => "Product created successfully.", "data" => $result]);
       } else {
-        throw new Exception("Cannot process product data.", 400);
+        throw new ApiException("Cannot process product data.", 400);
       }
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
       echo json_encode(["message" => $e->getMessage()]);
@@ -69,12 +74,12 @@ class ProductsController
     try {
       $model = new Product($this->db);
       if (!$productId) {
-        throw new Exception("Id not provided.", 400);
+        throw new ApiException("Id not provided.", 400);
       }
 
       $model->delete($productId);
       http_response_code(204);
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
       echo json_encode(["message" => $e->getMessage()]);

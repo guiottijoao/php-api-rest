@@ -1,5 +1,10 @@
 <?php
-require_once __DIR__ . '/../models/OrderItem.php';
+
+namespace App\controllers;
+
+use App\models\OrderItem;
+use App\exceptions\ApiException;
+use PDO;
 
 class OrderItemController
 {
@@ -23,7 +28,7 @@ class OrderItemController
 
       header('Content-type: application/json');
       echo json_encode($data);
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = $e->getCode();
       http_response_code($code);
       echo json_encode(["message: " => $e->getMessage()]);
@@ -37,14 +42,14 @@ class OrderItemController
 
       $input = json_decode(file_get_contents('php://input'), true);
 
-      if (!$input) throw new Error("Required fields not filled.", 400);
+      if (!$input) throw new ApiException("Required fields not filled.", 400);
       if (!isset($input['product_code'], $input['amount'])) { // os outros campos  são calculados
-        throw new Exception("Expected fields: 'order', 'product', 'amount', 'price', 'tax'.");
+        throw new ApiException("Expected fields: 'order', 'product', 'amount', 'price', 'tax'.");
       }
 
       foreach ($input as $field => $value) {
         if (empty($value)) {
-          throw new Exception("Field $field is required", 400);
+          throw new ApiException("Field $field is required", 400);
         }
       }
 
@@ -55,9 +60,9 @@ class OrderItemController
         http_response_code(201);
         echo json_encode(["message" => "Order item created successfully.", "data" => $result]);
       } else {
-        throw new Exception("Cannot process order item data.", 400);
+        throw new ApiException("Cannot process order item data.", 400);
       }
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
       echo json_encode(["message" => $e->getMessage()]);
@@ -69,12 +74,12 @@ class OrderItemController
     try {
       $model = new OrderItem($this->db);
       if (!$orderItemId) {
-        throw new Exception("Id not provided.", 400);
+        throw new ApiException("Id not provided.", 400);
       }
 
       $model->delete($orderItemId);
       http_response_code(204);
-    } catch (Exception $e) {
+    } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
       echo json_encode(["message" => $e->getMessage()]);
