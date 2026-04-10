@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Exceptions\ApiException;
@@ -9,38 +11,34 @@ use PDO;
 class ProductsController
 {
 
-  private $db;
+  private PDO $db;
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function index($id = null)
+  public function index(?int $id = null): void
   {
     try {
       $model = new Product($this->db);
-      if ($id) {
-        $data = $model->findById($id);
-      } else {
-        $data = $model->list();
-      }
+      $data = $id ? $model->findById($id) : $model->list();
 
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
       echo json_encode($data);
     } catch (ApiException $e) {
-      $code = $e->getCode();
+      $code = (int)$e->getCode() ?: 500;
       http_response_code($code);
-      echo json_encode(["message: " => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 
-  public function store()
+  public function store(): void
   {
     try {
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
 
-      $input = json_decode(file_get_contents('php://input'), true);
+      $input = json_decode(file_get_contents('php://input'), associative: true);
 
       if (!$input) throw new ApiException("Required fields not filled.", 400);
       if (!isset($input['name'], $input['amount'], $input['price'], $input['category_code'])) {
@@ -63,13 +61,13 @@ class ProductsController
         throw new ApiException("Cannot process product data.", 400);
       }
     } catch (ApiException $e) {
-      $code = (int)$e->getCode();
-      http_response_code($code ?: 500);
+      $code = (int)$e->getCode() ?: 500;
+      http_response_code($code);
       echo json_encode(["message" => $e->getMessage()]);
     }
   }
 
-  public function delete($productId)
+  public function delete(int $productId): void
   {
     try {
       $model = new Product($this->db);
@@ -80,8 +78,8 @@ class ProductsController
       $model->delete($productId);
       http_response_code(204);
     } catch (ApiException $e) {
-      $code = (int)$e->getCode();
-      http_response_code($code ?: 500);
+      $code = (int)$e->getCode() ?: 500;
+      http_response_code($code);
       echo json_encode(["message" => $e->getMessage()]);
     }
   }
