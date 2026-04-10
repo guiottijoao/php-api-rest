@@ -73,10 +73,6 @@ class OrderItemController
   {
     try {
       $model = new OrderItem($this->db);
-      if (!$orderItemId) {
-        throw new ApiException("Id not provided.", 400);
-      }
-
       $model->delete($orderItemId);
       http_response_code(204);
     } catch (ApiException $e) {

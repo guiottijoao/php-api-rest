@@ -69,9 +69,6 @@ class CategoryController
   {
     try {
       $model = new Category($this->db);
-      if (!$categoryId) {
-        throw new ApiException("Id not provided.", 400);
-      }
       $model->delete($categoryId);
       http_response_code(204);
     } catch (ApiException $e) {

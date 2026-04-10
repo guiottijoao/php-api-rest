@@ -71,10 +71,6 @@ class ProductsController
   {
     try {
       $model = new Product($this->db);
-      if (!$productId) {
-        throw new ApiException("Id not provided.", 400);
-      }
-
       $model->delete($productId);
       http_response_code(204);
     } catch (ApiException $e) {
