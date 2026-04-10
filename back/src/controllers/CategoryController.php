@@ -37,7 +37,7 @@ class CategoryController
   public function store()
   {
     try {
-      header('Content-Type: applicatio/json');
+      header('Content-Type: application/json');
 
       $input = json_decode(file_get_contents("php://input"), true);
 
