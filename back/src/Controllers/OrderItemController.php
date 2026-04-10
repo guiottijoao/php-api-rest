@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Models\OrderItem;
@@ -9,22 +11,18 @@ use PDO;
 class OrderItemController
 {
 
-  private $db;
+  private PDO $db;
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function index($id = null)
+  public function index(?int $id = null): void
   {
     try {
       $model = new OrderItem($this->db);
-      if ($id) {
-        $data = $model->findById($id);
-      } else {
-        $data = $model->list();
-      }
+      $data = $id ? $model->findById($id) : $model->list();
 
       header('Content-Type: application/json');
       echo json_encode($data);
@@ -35,12 +33,12 @@ class OrderItemController
     }
   }
 
-  public function store()
+  public function store(): void
   {
     try {
       header('Content-Type: application/json');
 
-      $input = json_decode(file_get_contents('php://input'), true);
+      $input = json_decode(file_get_contents('php://input'), associative: true);
 
       if (!$input) throw new ApiException("Required fields not filled.", 400);
       if (!isset($input['product_code'], $input['amount'])) { // os outros campos  são calculados
@@ -69,7 +67,7 @@ class OrderItemController
     }
   }
 
-  public function delete($orderItemId)
+  public function delete(int $orderItemId): void
   {
     try {
       $model = new OrderItem($this->db);
