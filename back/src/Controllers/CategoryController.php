@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Models\Category;
@@ -9,37 +11,34 @@ use PDO;
 class CategoryController
 {
 
-  private $db;
+  private PDO $db;
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function index($id = null)
+  public function index(?int $id = null): void
   {
     try {
       $model = new Category($this->db);
-      if ($id) {
-        $data = $model->findById($id);
-      } else {
-        $data = $model->list();
-      }
+      $data = $id ? $model->findById($id) : $model->list();
+
       header('Content-Type: application/json');
       echo json_encode($data);
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code ?: 500);
-      echo json_encode(["message: " => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 
-  public function store()
+  public function store(): void
   {
     try {
       header('Content-Type: application/json');
 
-      $input = json_decode(file_get_contents("php://input"), true);
+      $input = json_decode(file_get_contents("php://input"), associative: true);
 
       if (!$input) throw new ApiException("Required fields not filled.");
 
@@ -66,7 +65,7 @@ class CategoryController
     }
   }
 
-  public function delete($categoryId)
+  public function delete(int $categoryId): void
   {
     try {
       $model = new Category($this->db);
