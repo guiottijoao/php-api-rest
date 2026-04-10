@@ -27,7 +27,7 @@ class OrderController
         $data = $model->list();
       }
 
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
       echo json_encode($data);
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
@@ -44,7 +44,7 @@ class OrderController
   public function store()
   {
     try {
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
 
       $input = json_decode(file_get_contents('php://input'), true);
 

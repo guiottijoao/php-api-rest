@@ -19,7 +19,7 @@ class CancelOrderController
   public function update($orderId)
   {
     try {
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
 
       $model = new Order($this->db);
       $model->cancel($orderId);

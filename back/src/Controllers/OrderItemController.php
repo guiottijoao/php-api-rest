@@ -26,19 +26,19 @@ class OrderItemController
         $data = $model->list();
       }
 
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
       echo json_encode($data);
     } catch (ApiException $e) {
       $code = $e->getCode();
       http_response_code($code);
-      echo json_encode(["message: " => $e->getMessage()]);
+      echo json_encode(["message" => $e->getMessage()]);
     }
   }
 
   public function store()
   {
     try {
-      header('Content-type: application/json');
+      header('Content-Type: application/json');
 
       $input = json_decode(file_get_contents('php://input'), true);
 
