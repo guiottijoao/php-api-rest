@@ -48,11 +48,12 @@ class Category extends BaseModel
       throw new ApiException("Category not found.", 404);
     }
 
-    $associated_registers_stmt = $this->db->query(
+    $associated_registers_stmt = $this->db->prepare(
       "SELECT * FROM products p
-      WHERE p.category_code = '$categoryId'
+      WHERE p.category_code = :code
       AND p.status = 'active'"
     );
+    $associated_registers_stmt->execute([":code" => $categoryId]);
     if ($associated_registers_stmt->fetch()) {
       throw new ApiException("Can't delete, this item has associated registers.", 422);
     }
