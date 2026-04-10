@@ -9,14 +9,14 @@ use PDO;
 class CancelOrderController
 {
   
-  private $db;
+  private PDO $db;
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function update($orderId)
+  public function update(int $orderId): void
   {
     try {
       header('Content-Type: application/json');
