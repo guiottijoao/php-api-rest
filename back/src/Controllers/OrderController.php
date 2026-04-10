@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use PDO;
@@ -10,22 +12,18 @@ use Exception;
 class OrderController
 {
 
-  private $db;
+  private PDO $db;
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function index($id = null)
+  public function index(?int $id = null): void
   {
     try {
       $model = new Order($this->db);
-      if ($id) {
-        $data = $model->findById($id);
-      } else {
-        $data = $model->list();
-      }
+      $data = $id ? $model->findById($id) : $model->list();
 
       header('Content-Type: application/json');
       echo json_encode($data);
@@ -41,12 +39,12 @@ class OrderController
     }
   }
 
-  public function store()
+  public function store(): void
   {
     try {
       header('Content-Type: application/json');
 
-      $input = json_decode(file_get_contents('php://input'), true);
+      $input = json_decode(file_get_contents('php://input'), associative: true);
 
       if (!$input) throw new ApiException("Required fields not filled.", 400);
       if (!isset($input['total'], $input['tax'])) {
@@ -63,7 +61,7 @@ class OrderController
       $result = $model->save($input);
 
       if ($result) {
-        http_response_code(200);
+        http_response_code(201);
         echo json_encode(["message" => "Order created successfully.", "data" => $result]);
       } else {
         throw new ApiException("Cannot process order data.", 400);
@@ -80,7 +78,7 @@ class OrderController
     }
   }
 
-  public function delete($orderId)
+  public function delete(int $orderId): void
   {
     try {
       $model = new Order($this->db);
@@ -89,11 +87,11 @@ class OrderController
       }
 
       $model->delete($orderId);
-      http_response_code(200);
+      http_response_code(204);
     } catch (ApiException $e) {
       $code = (int)$e->getCode();
       http_response_code($code);
-      echo json_encode(["message" => $e->getMessage()]);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 }
