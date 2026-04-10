@@ -10,7 +10,7 @@ class Order extends BaseModel
 {
   protected $table = 'orders';
 
-  public function __contruct(PDO $db)
+  public function __construct(PDO $db)
   {
     $this->db = $db;
   }
