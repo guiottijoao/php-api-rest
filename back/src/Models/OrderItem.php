@@ -17,6 +17,9 @@ class OrderItem extends BaseModel
     $this->db = $db;
   }
 
+  /**
+   * @return array<int, array<string, mixed>>
+   */
   public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
@@ -42,6 +45,10 @@ class OrderItem extends BaseModel
     return $items;
   }
 
+  /**
+   * @param int $id
+   * @return array<string, mixed>
+   */
   public function findById(int $id): array
   {
     $result = parent::findById($id);
@@ -51,6 +58,10 @@ class OrderItem extends BaseModel
     return $result;
   }
 
+  /**
+   * @param array<string, mixed>
+   * @return array<string, mixed>
+   */
   public function save(array $data): array
   {
     $this->validate($data);
@@ -192,6 +203,10 @@ class OrderItem extends BaseModel
     }
   }
 
+  /**
+   * @param int $orderItemId
+   * @return void
+   */
   public function delete(int $orderItemId): void
   {
     $this->calculateOrderWhenItemDeleted($orderItemId);
@@ -209,6 +224,11 @@ class OrderItem extends BaseModel
     parent::delete($orderItemId);
   }
 
+
+  /**
+   * @param array<string, mixed>
+   * @return void
+   */
   private function validate(array $data): void
   {
     $productCode = $data['product_code'];
@@ -253,6 +273,9 @@ class OrderItem extends BaseModel
     }
   }
 
+  /**
+   * @return int
+   */
   public function generateOrderItemBusinessCode(): int
   {
     $stmt = $this->db->prepare(
@@ -263,6 +286,10 @@ class OrderItem extends BaseModel
     return $stmt->fetchColumn();
   }
 
+  /**
+   * @param int $orderItemId
+   * @return string
+   */
   private function getProductName(int $orderItemId): string
   {
     $stmt = $this->db->prepare(
@@ -277,6 +304,10 @@ class OrderItem extends BaseModel
     return $stmt->fetchColumn();
   }
 
+  /**
+   * @param int $productId
+   * @return float
+   */
   private function getCategoryTax(int $productId): float
   {
     $search_category_tax = $this->db->prepare(
@@ -290,6 +321,10 @@ class OrderItem extends BaseModel
     return (float)$search_category_tax->fetchColumn();
   }
 
+  /**
+   * @param int @productId
+   * @return float
+  */
   private function getProductPrice(int $productId): float
   {
     $search_product_price = $this->db->prepare(
@@ -301,6 +336,12 @@ class OrderItem extends BaseModel
     return (float)$search_product_price->fetchColumn();
   }
 
+  /**
+   * @param float $taxPercent
+   * @param float $unitPrice
+   * @param int $amount
+   * @return float
+   */
   private function calcOrderItemTotalTax(
     float $taxPercent,
     float $unitPrice,
@@ -310,12 +351,23 @@ class OrderItem extends BaseModel
     return (float)$result;
   }
 
+  /**
+   * @param mixed $totalTax
+   * @param mixed $price
+   * @param int $amount
+   * @return float
+   */
   private function getOrderItemTotalPrice(mixed $totalTax, mixed $price, int $amount): float
   {
     $result =  $totalTax + ($price * $amount);
     return (float)$result;
   }
 
+  /**
+   * @param int $productId
+   * @param array<string, mixed> $orderItem
+   * @return bool
+   */
   private function verifyStockAvailability(int $productId, array $orderItem): bool
   {
     $existing_item_amount_stmt = $this->db->prepare(
@@ -347,6 +399,11 @@ class OrderItem extends BaseModel
     return true;
   }
 
+  /**
+   * @param int $productId
+   * @param int $orderId
+   * @return bool
+   */
   private function isOrderItemRepeated(int $productId, int $orderId): bool
   {
     $stmt = $this->db->prepare(
@@ -361,6 +418,10 @@ class OrderItem extends BaseModel
     return false;
   }
 
+  /**
+   * @param int $deleteItemId
+   * @return void
+   */
   private function calculateOrderWhenItemDeleted(int $deletedItemId): void
   {
 
