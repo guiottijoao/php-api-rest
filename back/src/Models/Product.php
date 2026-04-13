@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,14 +9,14 @@ use PDO;
 
 class Product extends BaseModel
 {
-  protected $table = 'products';
+  protected string $table = 'products';
 
-  public function __construct($db)
+  public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function list()
+  public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -25,7 +26,7 @@ class Product extends BaseModel
     return $items;
   }
 
-  public function findById($id)
+  public function findById(int $id): array
   {
     $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
@@ -37,7 +38,7 @@ class Product extends BaseModel
     return $result;
     }
 
-  public function save($data)
+  public function save(array $data): array
   {
     $this->validate($data);
 
@@ -52,7 +53,7 @@ class Product extends BaseModel
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  public function delete($productId)
+  public function delete(int $productId): void
   {
     $check_existence_stmt = $this->db->prepare("SELECT code FROM products WHERE code = :id");
     $check_existence_stmt->execute([":id" => $productId]);
@@ -73,10 +74,10 @@ class Product extends BaseModel
       throw new ApiException("Can't delete, this item has associated registers.", 422);
     }
 
-    return parent::softDelete($productId);
+    parent::softDelete($productId);
   }
 
-  private function validate(array $data)
+  private function validate(array $data): void
   {
     $name = $data['name'];
     $amount = $data['amount'];
@@ -110,7 +111,7 @@ class Product extends BaseModel
     }
   }
 
-  private function getTaxById(int $id)
+  private function getTaxById(int $id): float
   {
     $stmt = $this->db->prepare(
     "SELECT c.tax FROM categories c
@@ -119,6 +120,7 @@ class Product extends BaseModel
     WHERE p.code = :code"
     );
     $stmt->execute([":code" => $id]);
-    return $stmt->fetchColumn();
+    $result = $stmt->fetchColumn();
+    return (float)$result;
   }
 }
