@@ -1,12 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Exceptions;
 
 use Exception;
 
 class ApiException extends Exception {
-  private $statusCode;
-  private $publicMessage;
+  private string $publicMessage;
 
   public function __construct(
     string $publicMessage,
@@ -16,7 +16,6 @@ class ApiException extends Exception {
   ) {
     parent::__construct($internalMessage ?? $publicMessage, $statusCode, $previous);
     $this->publicMessage = $publicMessage;
-    $this->statusCode = $statusCode;
   }
 
   public function getPublicMessage(): string {
@@ -24,6 +23,6 @@ class ApiException extends Exception {
   }
 
   public function getStatusCode(): int {
-    return $this->statusCode;
+    return $this->code;
   }
 }
