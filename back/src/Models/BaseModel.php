@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Models;
@@ -35,7 +36,8 @@ abstract class BaseModel
     $stmt->execute([':code' => $id, ':status' => $status]);
   }
 
-  public function delete(int $id): void {
+  public function delete(int $id): void
+  {
     $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
   }
@@ -44,7 +46,11 @@ abstract class BaseModel
   {
     $status = $this->table === 'orders' ? 'open' : 'active';
     $table = $this->table === 'order_item' ? 'orders' : $this->table;
-    $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM {$table} WHERE status = :status");
+    $stmt = $this->db->prepare(
+      "SELECT COALESCE(MAX(business_code) + 1, 1)
+    FROM {$table}
+    WHERE status = :status"
+    );
     $stmt->execute([":status" => $status]);
     return $stmt->fetchColumn();
   }
@@ -59,7 +65,12 @@ abstract class BaseModel
     $trimmedName = trim($name);
     $normalizedName = str_replace(' ', '', $trimmedName);
 
-    $stmt = $this->db->prepare("SELECT COUNT(*) FROM {$this->table} WHERE status = 'active' AND LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)");
+    $stmt = $this->db->prepare(
+      "SELECT COUNT(*)
+    FROM {$this->table}
+    WHERE status = 'active'
+    AND LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)"
+    );
     $stmt->execute([':normalizedName' => $normalizedName]);
     return $stmt->fetchColumn() > 0;
   }

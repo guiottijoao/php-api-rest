@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Models;
@@ -32,7 +33,10 @@ class Category extends BaseModel
     $this->validate($data);
     $businessCode = parent::generateBusinessCode();
 
-    $stmt = $this->db->prepare("INSERT INTO categories (name, tax, business_code) VALUES (:name, :tax, :business_code) RETURNING *");
+    $stmt = $this->db->prepare(
+      "INSERT INTO categories (name, tax, business_code)
+      VALUES (:name, :tax, :business_code) RETURNING *"
+    );
     $stmt->bindValue(':name', parent::sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':tax', (float)$data['tax']);
     $stmt->bindValue(':business_code', $businessCode);

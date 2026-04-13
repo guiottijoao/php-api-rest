@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Models;
@@ -36,13 +37,16 @@ class Product extends BaseModel
     }
     $result['tax'] = $this->getTaxById($result['code']);
     return $result;
-    }
+  }
 
   public function save(array $data): array
   {
     $this->validate($data);
 
-    $stmt = $this->db->prepare("INSERT INTO products (name, amount, price, category_code, business_code) VALUES (:name, :amount, :price, :category_code, :business_code) RETURNING *");
+    $stmt = $this->db->prepare(
+      "INSERT INTO products (name, amount, price, category_code, business_code)
+      VALUES (:name, :amount, :price, :category_code, :business_code) RETURNING *"
+    );
     $stmt->bindValue(':name', $this->sanitize($data['name']), PDO::PARAM_STR);
     $stmt->bindValue(':amount', (int)$data['amount']);
     $stmt->bindValue(':price', (float)$data['price']);
@@ -55,7 +59,11 @@ class Product extends BaseModel
 
   public function delete(int $productId): void
   {
-    $check_existence_stmt = $this->db->prepare("SELECT code FROM products WHERE code = :id");
+    $check_existence_stmt = $this->db->prepare(
+      "SELECT code
+      FROM products
+      WHERE code = :id"
+    );
     $check_existence_stmt->execute([":id" => $productId]);
     if (!$check_existence_stmt->fetchColumn()) {
       throw new ApiException("Product not found.", 404);
@@ -97,14 +105,22 @@ class Product extends BaseModel
     }
 
     if ($amount < 1 || $amount > 10000) {
-      throw new ApiException("Amount must be a number between 1 and 10000 (ten thousand).");
+      throw new ApiException(
+        "Amount must be a number between 1 and 10000 (ten thousand)."
+      );
     }
 
     if ($price < 0.1 || $price > 1000000000) {
-      throw new ApiException("Price must be a number between 0.1 and 1000000000 (one billion)");
+      throw new ApiException(
+        "Price must be a number between 0.1 and 1000000000 (one billion)"
+      );
     }
 
-    $verify_fk_existence = $this->db->prepare("SELECT COUNT(*) FROM categories WHERE code = :category_code");
+    $verify_fk_existence = $this->db->prepare(
+      "SELECT COUNT(*)
+      FROM categories
+      WHERE code = :category_code"
+    );
     $verify_fk_existence->execute([":category_code" => $categoryCode]);
     if (!$verify_fk_existence->fetchColumn()) {
       throw new ApiException("Category does not exist.");
@@ -114,7 +130,7 @@ class Product extends BaseModel
   private function getTaxById(int $id): float
   {
     $stmt = $this->db->prepare(
-    "SELECT c.tax FROM categories c
+      "SELECT c.tax FROM categories c
     INNER JOIN products p ON
     c.code = p.category_code
     WHERE p.code = :code"

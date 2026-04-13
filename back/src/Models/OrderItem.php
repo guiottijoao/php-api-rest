@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Models;
@@ -32,11 +33,11 @@ class OrderItem extends BaseModel
         $i['tax'],
         $i['price'],
         $i['amount'],
-        );
-        $order_stmt->execute([":code" => $i['code']]);
-        $order_status = $order_stmt->fetchColumn();
-        $items[$index]['order_status'] = $order_status;
-        $items[$index]['product_name'] = $this->getProductName($i['code']);
+      );
+      $order_stmt->execute([":code" => $i['code']]);
+      $order_status = $order_stmt->fetchColumn();
+      $items[$index]['order_status'] = $order_status;
+      $items[$index]['product_name'] = $this->getProductName($i['code']);
     }
     return $items;
   }
@@ -55,54 +56,103 @@ class OrderItem extends BaseModel
     $this->validate($data);
 
     $activeOrder = [];
-    $order_select_stmt = $this->db->query("SELECT * FROM orders WHERE status = 'open'");
+    $order_select_stmt = $this->db->query(
+      "SELECT * FROM orders
+      WHERE status = 'open'"
+    );
     $productId = $data['product_code'];
 
     $categoryTax = $this->getCategoryTax($productId);
     $productAmount = $data['amount'];
     $productPrice = $this->getProductPrice($productId);
-    $orderItemTotalTax = $this->calcOrderItemTotalTax($categoryTax, $productPrice, $productAmount);
+    $orderItemTotalTax = $this->calcOrderItemTotalTax(
+      $categoryTax,
+      $productPrice,
+      $productAmount
+    );
 
-    $orderItemTotalPrice = $this->getOrderItemTotalPrice($orderItemTotalTax, $productPrice, $productAmount);
+    $orderItemTotalPrice = $this->getOrderItemTotalPrice(
+      $orderItemTotalTax,
+      $productPrice,
+      $productAmount
+    );
 
     $order_items_stmt = $this->db->query("SELECT * FROM order_item");
     $orderItems = $order_items_stmt->fetch();
 
-    $order_insert_stmt = $this->db->prepare("INSERT INTO orders (total, tax, business_code) VALUES (:total, :tax, :business_code)");
-    $order_update_stmt = $this->db->prepare("UPDATE orders o
+    $order_insert_stmt = $this->db->prepare(
+      "INSERT INTO orders (total, tax, business_code)
+      VALUES (:total, :tax, :business_code)"
+    );
+    $order_update_stmt = $this->db->prepare(
+      "UPDATE orders o
       SET total = :total, tax = :tax
-      WHERE status = 'open'");
+      WHERE status = 'open'"
+    );
 
     $activeOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
 
     $insert_item_stmt = $this->db->prepare(
-      "INSERT INTO order_item (order_code, product_code, amount, price, tax, business_code)
-        VALUES (:order_code, :product_code, :amount, :price, :tax, :business_code)
+      "INSERT INTO order_item
+      (order_code, product_code, amount, price, tax, business_code)
+        VALUES
+        (:order_code, :product_code, :amount, :price, :tax, :business_code)
         RETURNING *"
     );
 
     if (!$activeOrder) {
-      $order_insert_stmt->execute([":total" => $orderItemTotalPrice,  ":tax" => $orderItemTotalTax, ":business_code" => parent::generateBusinessCode()]);
-      $order_select_stmt = $this->db->query("SELECT * FROM orders o WHERE o.status = 'open'");
+      $order_insert_stmt->execute([
+        ":total" => $orderItemTotalPrice,
+        ":tax" => $orderItemTotalTax,
+        ":business_code" => parent::generateBusinessCode()
+      ]);
+      $order_select_stmt = $this->db->query(
+        "SELECT *
+        FROM orders o
+        WHERE o.status = 'open'"
+      );
       $activeOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
 
-      $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
+      $insert_item_stmt->execute([
+        ":order_code" => $activeOrder['code'],
+        ":product_code" => $productId,
+        "amount" => $productAmount,
+        ":price" => $productPrice,
+        ":tax" => $orderItemTotalTax,
+        ":business_code" => $this->generateOrderItemBusinessCode()
+      ]);
 
       $item = $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
-      $item['total'] = $this->getOrderItemTotalPrice($item['tax'], $item['price'], $item['amount']);
+      $item['total'] = $this->getOrderItemTotalPrice(
+        $item['tax'],
+        $item['price'],
+        $item['amount']
+      );
       return $item;
     } else {
       $orderTotalPrice = $activeOrder['total'] + $orderItemTotalPrice;
       $orderTotalTax = $activeOrder['tax'] + $orderItemTotalTax;
-      $order_update_stmt->execute([":total" => $orderTotalPrice, ":tax" => $orderTotalTax]);
+      $order_update_stmt->execute([
+        ":total" => $orderTotalPrice,
+        ":tax" => $orderTotalTax
+      ]);
 
       if ($orderItems && $this->isOrderItemRepeated($productId, $activeOrder['code'])) {
-        $stmt = $this->db->prepare("SELECT * FROM order_item o
-            WHERE o.product_code = :product_code AND o.order_code = :order_code");
-        $stmt->execute([":product_code" => $data['product_code'], ":order_code" => $activeOrder['code']]);
+        $stmt = $this->db->prepare("SELECT *
+        FROM order_item o
+        WHERE o.product_code = :product_code
+        AND o.order_code = :order_code");
+        $stmt->execute([
+          ":product_code" => $data['product_code'],
+          ":order_code" => $activeOrder['code']
+        ]);
         $existingOrderItem = $stmt->fetch(PDO::FETCH_ASSOC);
         $amountsAdded = $data['amount'] + $existingOrderItem['amount'];
-        $newTotalTax = $this->calcOrderItemTotalTax($categoryTax, $productPrice, $data['amount']) + $existingOrderItem['tax'];
+        $newTotalTax = $this->calcOrderItemTotalTax(
+          $categoryTax,
+          $productPrice,
+          $data['amount']
+        ) + $existingOrderItem['tax'];
 
         $existing_item_stmt = $this->db->prepare(
           "UPDATE order_item o
@@ -111,14 +161,33 @@ class OrderItem extends BaseModel
             RETURNING *"
         );
 
-        $existing_item_stmt->execute([":new_amount" => $amountsAdded, ":new_total_tax" => $newTotalTax, ":product_code" => $productId]);
+        $existing_item_stmt->execute([
+          ":new_amount" => $amountsAdded,
+          ":new_total_tax" => $newTotalTax,
+          ":product_code" => $productId
+        ]);
         $item = $existing_item_stmt->fetch(PDO::FETCH_ASSOC);
-        $item['total'] = $this->getOrderItemTotalPrice($item['tax'], $item['price'], $item['amount']);
+        $item['total'] = $this->getOrderItemTotalPrice(
+          $item['tax'],
+          $item['price'],
+          $item['amount']
+        );
         return $item;
       }
-      $insert_item_stmt->execute([":order_code" => $activeOrder['code'], ":product_code" => $productId, "amount" => $productAmount, ":price" => $productPrice, ":tax" => $orderItemTotalTax, ":business_code" => $this->generateOrderItemBusinessCode()]);
+      $insert_item_stmt->execute([
+        ":order_code" => $activeOrder['code'],
+        ":product_code" => $productId,
+        "amount" => $productAmount,
+        ":price" => $productPrice,
+        ":tax" => $orderItemTotalTax,
+        ":business_code" => $this->generateOrderItemBusinessCode()
+      ]);
       $item = $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
-      $item['total'] = $this->getOrderItemTotalPrice($item['tax'], $item['price'], $item['amount']);
+      $item['total'] = $this->getOrderItemTotalPrice(
+        $item['tax'],
+        $item['price'],
+        $item['amount']
+      );
       return $item;
     }
   }
@@ -127,7 +196,11 @@ class OrderItem extends BaseModel
   {
     $this->calculateOrderWhenItemDeleted($orderItemId);
 
-    $check_existence_stmt = $this->db->prepare("SELECT code FROM order_item WHERE code = :id");
+    $check_existence_stmt = $this->db->prepare(
+      "SELECT code
+      FROM order_item
+      WHERE code = :id"
+    );
     $check_existence_stmt->execute([":id" => $orderItemId]);
     if (!$check_existence_stmt->fetchColumn()) {
       throw new ApiException("Order item not found.", 404);
@@ -141,13 +214,22 @@ class OrderItem extends BaseModel
     $productCode = $data['product_code'];
     $amount = $data['amount'];
 
-    $product_stmt = $this->db->prepare("SELECT * FROM products WHERE code = :code AND status = 'active'");
+    $product_stmt = $this->db->prepare(
+      "SELECT *
+      FROM products
+      WHERE code = :code
+      AND status = 'active'"
+    );
     $product_stmt->execute([":code" => $productCode]);
 
-    if ($product_stmt->rowCount() === 0) throw new ApiException("Product doesn't exist.", 404);
-
+    if ($product_stmt->rowCount() === 0) {
+      throw new ApiException("Product doesn't exist.", 404);
+    }
     if ($amount < 1 || $amount > 10000 || !filter_var($amount, FILTER_VALIDATE_INT)) {
-      throw new ApiException("Amount must be an integer number between 1 and 10000 (ten thousand).", 400);
+      throw new ApiException(
+        "Amount must be an integer number between 1 and 10000 (ten thousand).",
+        400
+      );
     }
 
     $verify_associated_product_existence = $this->db->prepare(
@@ -173,18 +255,23 @@ class OrderItem extends BaseModel
 
   public function generateOrderItemBusinessCode(): int
   {
-    $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM order_item");
+    $stmt = $this->db->prepare(
+      "SELECT COALESCE(MAX(business_code) + 1, 1)
+    FROM order_item"
+    );
     $stmt->execute();
     return $stmt->fetchColumn();
   }
 
-  private function getProductName(int $orderItemId): string {
+  private function getProductName(int $orderItemId): string
+  {
     $stmt = $this->db->prepare(
-    "SELECT p.name
+      "SELECT p.name
     FROM products p
     INNER JOIN order_item oi
     ON p.code = oi.product_code
-    WHERE oi.code = :code");
+    WHERE oi.code = :code"
+    );
 
     $stmt->execute([":code" => $orderItemId]);
     return $stmt->fetchColumn();
@@ -214,8 +301,11 @@ class OrderItem extends BaseModel
     return (float)$search_product_price->fetchColumn();
   }
 
-  private function calcOrderItemTotalTax(float $taxPercent, float $unitPrice, int $amount): float
-  {
+  private function calcOrderItemTotalTax(
+    float $taxPercent,
+    float $unitPrice,
+    int $amount
+  ): float {
     return $result = ($taxPercent / 100) * $unitPrice * $amount;
     return (float)$result;
   }
@@ -236,11 +326,17 @@ class OrderItem extends BaseModel
       WHERE oi.product_code = :product_code
       AND o.status = 'open'"
     );
-    $product_stmt = $this->db->prepare("SELECT * FROM products WHERE code = :code");
+    $product_stmt = $this->db->prepare(
+      "SELECT *
+      FROM products
+      WHERE code = :code"
+    );
     $product_stmt->execute([":code" => $productId]);
     $product = $product_stmt->fetch(PDO::FETCH_ASSOC);
 
-    $existing_item_amount_stmt->execute([":product_code" => $orderItem['product_code']]);
+    $existing_item_amount_stmt->execute([
+      ":product_code" => $orderItem['product_code']
+    ]);
     $existingItemAmount = $existing_item_amount_stmt->fetchColumn();
     if ($product['amount'] < $orderItem['amount'] + $existingItemAmount) {
       if ($product['amount'] === 0) {
@@ -253,7 +349,13 @@ class OrderItem extends BaseModel
 
   private function isOrderItemRepeated(int $productId, int $orderId): bool
   {
-    $stmt = $this->db->prepare("SELECT * FROM order_item o WHERE o.product_code = :product_code AND o.order_code = :order_code");
+    $stmt = $this->db->prepare(
+      "SELECT *
+      FROM order_item o
+      WHERE o.product_code =
+      :product_code
+      AND o.order_code = :order_code"
+    );
     $stmt->execute([":product_code" => $productId, ":order_code" => $orderId]);
     if ($stmt->rowCount() > 0) return true;
     return false;
@@ -277,8 +379,16 @@ class OrderItem extends BaseModel
     $orderTotalPrice = $activeOrder['total'] - $itemTotalPrice;
     $orderTotalTax = $activeOrder['tax'] - $itemToDelete['tax'];
 
-    $order_update_stmt = $this->db->prepare("UPDATE orders o SET total = :total, tax = :tax WHERE o.code = :order_code");
-    $order_update_stmt->execute([":total" => $orderTotalPrice, ":tax" => $orderTotalTax, ":order_code" => $itemToDelete['order_code']]);
+    $order_update_stmt = $this->db->prepare(
+      "UPDATE orders o
+      SET total = :total, tax = :tax
+      WHERE o.code = :order_code"
+    );
+    $order_update_stmt->execute([
+      ":total" => $orderTotalPrice,
+      ":tax" => $orderTotalTax,
+      ":order_code" => $itemToDelete['order_code']
+    ]);
 
     if ($order_update_stmt->rowCount() === 0) {
       throw new ApiException("Error during total calculation, no rows affected.");

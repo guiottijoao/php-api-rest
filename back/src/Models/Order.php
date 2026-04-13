@@ -31,9 +31,16 @@ class Order extends BaseModel
     $this->validate($data);
 
     $businessCode = parent::generateBusinessCode();
-    $stmt = $this->db->prepare("INSERT INTO orders (total, tax, business_code) VALUES (:total, :tax, :business_code) RETURNING *");
+    $stmt = $this->db->prepare(
+      "INSERT INTO orders (total, tax, business_code)
+      VALUES (:total, :tax, :business_code) RETURNING *"
+    );
 
-    $stmt->execute([":total" => (float)$data['total'], ":tax" => (float)$data['tax'], ":business_code" => $businessCode]);
+    $stmt->execute([
+      ":total" => (float)$data['total'],
+      ":tax" => (float)$data['tax'],
+      ":business_code" => $businessCode
+    ]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$result) {
@@ -44,12 +51,20 @@ class Order extends BaseModel
 
   public function finish(int $orderId): void
   {
-    $order_select_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
+    $order_select_stmt = $this->db->prepare(
+      "SELECT * FROM orders o
+      WHERE o.code = :code
+      AND o.status = 'open'"
+    );
     $order_select_stmt->execute([":code" => $orderId]);
     $openOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
     if ($openOrder) {
       $openOrderId = $openOrder['code'];
-      $order_item_select_stmt = $this->db->prepare("SELECT * FROM order_item oi WHERE oi.order_code = :order_code");
+      $order_item_select_stmt = $this->db->prepare(
+        "SELECT *
+        FROM order_item oi
+        WHERE oi.order_code = :order_code"
+      );
       $order_item_select_stmt->execute([":order_code" => $openOrderId]);
       $orderItems = $order_item_select_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -61,14 +76,20 @@ class Order extends BaseModel
         $this->discountStock($item);
       }
 
-      $open_order_update_stmt = $this->db->prepare("UPDATE orders SET status = 'closed'");
+      $open_order_update_stmt = $this->db->prepare(
+        "UPDATE orders
+        SET status = 'closed'"
+      );
       $open_order_update_stmt->execute();
     }
   }
 
   public function cancel(int $orderId): void
   {
-    $active_order_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
+    $active_order_stmt = $this->db->prepare("SELECT *
+    FROM orders o
+    WHERE o.code = :code
+    AND o.status = 'open'");
     $active_order_stmt->execute([":code" => $orderId]);
     $order = $active_order_stmt->fetch(PDO::FETCH_ASSOC);
     if (!$order) throw new ApiException("Order not found.", 404);
@@ -77,16 +98,27 @@ class Order extends BaseModel
     $orderItems = $order_items_stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!$orderItems) throw new ApiException("Order has no items.", 400);
 
-    $delete_order_items_stmt = $this->db->prepare("DELETE FROM order_item o WHERE o.order_code = :order_code");
+    $delete_order_items_stmt = $this->db->prepare(
+      "DELETE FROM order_item o
+      WHERE o.order_code = :order_code"
+    );
     $delete_order_items_stmt->execute([":order_code" => $order['code']]);
 
-    $update_order_total_and_tax = $this->db->prepare("UPDATE orders o SET total = 0, tax = 0 WHERE  o.code = :order_code");
+    $update_order_total_and_tax = $this->db->prepare(
+      "UPDATE orders o
+      SET total = 0, tax = 0 WHERE
+      o.code = :order_code"
+    );
     $update_order_total_and_tax->execute([":order_code" => $order['code']]);
   }
 
   public function delete(int $orderId): void
   {
-    $check_existence_stmt = $this->db->prepare("SELECT code FROM orders WHERE code = :id");
+    $check_existence_stmt = $this->db->prepare(
+      "SELECT code
+      FROM orders
+      WHERE code = :id"
+    );
     $check_existence_stmt->execute([":id" => $orderId]);
     if (!$check_existence_stmt->fetchColumn()) {
       throw new ApiException("Product not found.", 404);
@@ -124,7 +156,15 @@ class Order extends BaseModel
     $productId = $orderItem['product_code'];
     $orderItemAmount = $orderItem['amount'];
 
-    $discount_statement = $this->db->prepare("UPDATE products p SET amount = amount - :item_amount WHERE p.code = :product_code");
-    $discount_statement->execute([":item_amount" =>  $orderItemAmount, ":product_code" => $productId]);
+    $discount_statement = $this->db->prepare(
+      "UPDATE products p 
+      SET amount = amount - :item_amount
+      WHERE p.code = :product_code"
+    );
+
+    $discount_statement->execute([
+      ":item_amount" =>  $orderItemAmount,
+      ":product_code" => $productId
+    ]);
   }
 }
