@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,14 +9,14 @@ use PDO;
 
 class OrderItem extends BaseModel
 {
-  protected $table = 'order_item';
+  protected string $table = 'order_item';
 
-  public function __construct($db)
+  public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function list()
+  public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
     $order_stmt = $this->db->prepare(
@@ -40,7 +41,7 @@ class OrderItem extends BaseModel
     return $items;
   }
 
-  public function findById($id)
+  public function findById(int $id): array
   {
     $result = parent::findById($id);
     if (!$result) {
@@ -49,7 +50,7 @@ class OrderItem extends BaseModel
     return $result;
   }
 
-  public function save($data)
+  public function save(array $data): array
   {
     $this->validate($data);
 
@@ -122,7 +123,7 @@ class OrderItem extends BaseModel
     }
   }
 
-  public function delete($orderItemId)
+  public function delete(int $orderItemId): void
   {
     $this->calculateOrderWhenItemDeleted($orderItemId);
 
@@ -132,10 +133,10 @@ class OrderItem extends BaseModel
       throw new ApiException("Order item not found.", 404);
     }
 
-    return parent::delete($orderItemId);
+    parent::delete($orderItemId);
   }
 
-  private function validate(array $data)
+  private function validate(array $data): void
   {
     $productCode = $data['product_code'];
     $amount = $data['amount'];
@@ -170,14 +171,14 @@ class OrderItem extends BaseModel
     }
   }
 
-  public function generateOrderItemBusinessCode()
+  public function generateOrderItemBusinessCode(): array
   {
     $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM order_item");
     $stmt->execute();
     return $stmt->fetchColumn();
   }
 
-  private function getProductName($orderItemId) {
+  private function getProductName(int $orderItemId): string {
     $stmt = $this->db->prepare(
     "SELECT p.name
     FROM products p
@@ -189,7 +190,7 @@ class OrderItem extends BaseModel
     return $stmt->fetchColumn();
   }
 
-  private function getCategoryTax(int $productId)
+  private function getCategoryTax(int $productId): float
   {
     $search_category_tax = $this->db->prepare(
       "SELECT c.tax
@@ -199,10 +200,10 @@ class OrderItem extends BaseModel
       WHERE p.code = :product_code"
     );
     $search_category_tax->execute([":product_code" => $productId]);
-    return $search_category_tax->fetchColumn();
+    return (float)$search_category_tax->fetchColumn();
   }
 
-  private function getProductPrice(int $productId)
+  private function getProductPrice(int $productId): float
   {
     $search_product_price = $this->db->prepare(
       "SELECT p.price
@@ -210,20 +211,22 @@ class OrderItem extends BaseModel
         WHERE p.code = :product_code"
     );
     $search_product_price->execute([":product_code" => $productId]);
-    return $search_product_price->fetchColumn();
+    return (float)$search_product_price->fetchColumn();
   }
 
-  private function calcOrderItemTotalTax(float $taxPercent, float $unitPrice, int $amount)
+  private function calcOrderItemTotalTax(float $taxPercent, float $unitPrice, int $amount): float
   {
-    return ($taxPercent / 100) * $unitPrice * $amount;
+    return $result = ($taxPercent / 100) * $unitPrice * $amount;
+    return (float)$result;
   }
 
-  private function getOrderItemTotalPrice(float $totalTax, float $price, int $amount)
+  private function getOrderItemTotalPrice(float $totalTax, float $price, int $amount): float
   {
-    return $totalTax + ($price * $amount);
+    $result =  $totalTax + ($price * $amount);
+    return (float)$result;
   }
 
-  private function verifyStockAvailability(int $productId, array $orderItem)
+  private function verifyStockAvailability(int $productId, array $orderItem): bool
   {
     $existing_item_amount_stmt = $this->db->prepare(
       "SELECT amount
@@ -248,7 +251,7 @@ class OrderItem extends BaseModel
     return true;
   }
 
-  private function isOrderItemRepeated($productId, $orderId)
+  private function isOrderItemRepeated(int $productId, int $orderId): bool
   {
     $stmt = $this->db->prepare("SELECT * FROM order_item o WHERE o.product_code = :product_code AND o.order_code = :order_code");
     $stmt->execute([":product_code" => $productId, ":order_code" => $orderId]);
@@ -256,7 +259,7 @@ class OrderItem extends BaseModel
     return false;
   }
 
-  private function calculateOrderWhenItemDeleted(int $deletedItemId)
+  private function calculateOrderWhenItemDeleted(int $deletedItemId): void
   {
 
     $item_stmt = $this->db->prepare("SELECT * FROM order_item o WHERE o.code = :code");
