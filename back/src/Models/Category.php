@@ -57,21 +57,9 @@ class Category extends BaseModel
    */
   public function delete(int $categoryId): void
   {
-    $check_existence_stmt = $this->db->prepare("SELECT code FROM categories WHERE code = :id");
-    $check_existence_stmt->execute([":id" => $categoryId]);
-    if (!$check_existence_stmt->fetchColumn()) {
-      throw new ApiException("Category not found.", 404);
-    }
+    parent::verifyExistence($categoryId);
 
-    $associated_registers_stmt = $this->db->prepare(
-      "SELECT * FROM products p
-      WHERE p.category_code = :category_code
-      AND p.status = 'active'"
-    );
-    $associated_registers_stmt->execute([":category_code" => $categoryId]);
-    if ($associated_registers_stmt->fetch()) {
-      throw new ApiException("Can't delete, this item has associated registers.", 422);
-    }
+    parent::verifyAssociatedRegisters($categoryId, 'categories');
 
     parent::softDelete($categoryId);
   }

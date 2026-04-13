@@ -134,26 +134,10 @@ class Order extends BaseModel
    */
   public function delete(int $orderId): void
   {
-    $check_existence_stmt = $this->db->prepare(
-      "SELECT code
-      FROM orders
-      WHERE code = :id"
-    );
-    $check_existence_stmt->execute([":id" => $orderId]);
-    if (!$check_existence_stmt->fetchColumn()) {
-      throw new ApiException("Product not found.", 404);
-    }
+    parent::verifyExistence($orderId);
 
-    $associated_registers_stmt = $this->db->prepare(
-      "SELECT * FROM order_item oi
-      WHERE oi.order_code = :code"
-    );
-    $associated_registers_stmt->execute([':code' => $orderId]);
-
-    if ($associated_registers_stmt->fetch()) {
-      throw new ApiException("Can't delete, this item has associated registers.", 422);
-    }
-
+    parent::verifyAssociatedRegisters($orderId, 'orders');
+    
     parent::softDelete($orderId);
   }
 

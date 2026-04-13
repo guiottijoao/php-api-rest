@@ -211,19 +211,10 @@ class OrderItem extends BaseModel
   {
     $this->calculateOrderWhenItemDeleted($orderItemId);
 
-    $check_existence_stmt = $this->db->prepare(
-      "SELECT code
-      FROM order_item
-      WHERE code = :id"
-    );
-    $check_existence_stmt->execute([":id" => $orderItemId]);
-    if (!$check_existence_stmt->fetchColumn()) {
-      throw new ApiException("Order item not found.", 404);
-    }
+    parent::verifyExistence($orderItemId);
 
-    parent::delete($orderItemId);
+    parent::hardDelete($orderItemId);
   }
-
 
   /**
    * @param array<string, mixed> $data
@@ -324,7 +315,7 @@ class OrderItem extends BaseModel
   /**
    * @param int @productId
    * @return float
-  */
+   */
   private function getProductPrice(int $productId): float
   {
     $search_product_price = $this->db->prepare(

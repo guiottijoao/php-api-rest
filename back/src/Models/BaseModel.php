@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exceptions\ApiException;
 use PDO;
 
 abstract class BaseModel
@@ -51,7 +52,7 @@ abstract class BaseModel
    * @param int $id
    * @return void
    */
-  public function delete(int $id): void
+  public function hardDelete(int $id): void
   {
     $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
@@ -99,5 +100,61 @@ abstract class BaseModel
     );
     $stmt->execute([':normalizedName' => $normalizedName]);
     return $stmt->fetchColumn() > 0;
+  }
+
+  /**
+   * @param int $id
+   * @return void
+   */
+  public function verifyExistence(int $id): void
+  {
+    $check_existence_stmt = $this->db->prepare(
+      "SELECT code
+      FROM {$this->table}
+      WHERE code = :id"
+    );
+    $check_existence_stmt->execute([":id" => $id]);
+    if (!$check_existence_stmt->fetchColumn()) {
+      throw new ApiException("{$this->table} not found.", 404);
+    }
+  }
+
+  /**
+   * @param int $id
+   * @param string $table
+   * @return void
+   */
+  public function verifyAssociatedRegisters(int $id, string $table): void
+  {
+    if ($table === 'products') {
+      $associated_registers_stmt = $this->db->prepare(
+        "SELECT * FROM order_item oi
+        INNER JOIN orders o
+        ON oi.order_code = o.code
+        WHERE oi.product_code = :product_code
+        AND o.status = 'open'"
+      );
+
+      $associated_registers_stmt->execute([':product_code' => $id]);
+    } else if ($table === 'categories') {
+      $associated_registers_stmt = $this->db->prepare(
+        "SELECT * FROM products p
+      WHERE p.category_code = :category_code
+      AND p.status = 'active'"
+      );
+
+      $associated_registers_stmt->execute([":category_code" => $id]);
+    } else {
+      $associated_registers_stmt = $this->db->prepare(
+        "SELECT * FROM order_item oi
+      WHERE oi.order_code = :code"
+      );
+      
+      $associated_registers_stmt->execute([':code' => $id]);
+    }
+
+    if ($associated_registers_stmt->fetch()) {
+      throw new ApiException("Can't delete, this item has associated registers.", 422);
+    }
   }
 }

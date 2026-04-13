@@ -74,28 +74,9 @@ class Product extends BaseModel
    */
   public function delete(int $productId): void
   {
-    $check_existence_stmt = $this->db->prepare(
-      "SELECT code
-      FROM products
-      WHERE code = :id"
-    );
-    $check_existence_stmt->execute([":id" => $productId]);
-    if (!$check_existence_stmt->fetchColumn()) {
-      throw new ApiException("Product not found.", 404);
-    }
+    parent::verifyExistence($productId);
 
-    $associated_registers_stmt = $this->db->prepare(
-      "SELECT * FROM order_item oi
-      INNER JOIN orders o
-      ON oi.order_code = o.code
-      WHERE oi.product_code = :product_code
-      AND o.status = 'open'"
-    );
-    $associated_registers_stmt->execute([':product_code' => $productId]);
-
-    if ($associated_registers_stmt->fetch()) {
-      throw new ApiException("Can't delete, this item has associated registers.", 422);
-    }
+    parent::verifyAssociatedRegisters($productId, 'products');
 
     parent::softDelete($productId);
   }
