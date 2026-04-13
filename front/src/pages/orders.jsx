@@ -100,7 +100,13 @@ function Products() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(createOrderItem(form));
+
+    const formData = new FormData(e.target);
+    const data = {
+      amount: parseInt(formData.get("amount")),
+      product_code: parseInt(formData.get("product_code")),
+    };
+    const result = await dispatch(createOrderItem(data));
     if (createOrderItem.rejected.match(result)) {
       Swal.fire({
         icon: "error",
