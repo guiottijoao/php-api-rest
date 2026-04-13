@@ -17,6 +17,9 @@ class Product extends BaseModel
     $this->db = $db;
   }
 
+  /**
+   * @return array<int, array<string, mixed>>
+   */
   public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
@@ -27,6 +30,10 @@ class Product extends BaseModel
     return $items;
   }
 
+  /**
+   * @param int $id
+   * @return array<string, mixed>
+   */
   public function findById(int $id): array
   {
     $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE code = :id");
@@ -39,6 +46,10 @@ class Product extends BaseModel
     return $result;
   }
 
+  /**
+   * @param array<string, mixed> $data
+   * @return array<string, mixed>
+   */
   public function save(array $data): array
   {
     $this->validate($data);
@@ -57,6 +68,10 @@ class Product extends BaseModel
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  /**
+   * @param int $productId
+   * @return void
+   */
   public function delete(int $productId): void
   {
     $check_existence_stmt = $this->db->prepare(
@@ -85,6 +100,10 @@ class Product extends BaseModel
     parent::softDelete($productId);
   }
 
+  /**
+   * @param array<string, mixed> $data
+   * @return void
+   */
   private function validate(array $data): void
   {
     $name = $data['name'];
@@ -127,6 +146,10 @@ class Product extends BaseModel
     }
   }
 
+  /**
+   * @param int $id
+   * @return float
+   */
   private function getTaxById(int $id): float
   {
     $stmt = $this->db->prepare(
