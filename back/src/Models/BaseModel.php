@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,40 +7,40 @@ use PDO;
 
 abstract class BaseModel
 {
-  protected $db;
-  protected $table;
+  protected PDO $db;
+  protected string $table;
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function findById($id)
+  public function findById(int $id): array|false
   {
     $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  public function list()
+  public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  public function softDelete($id)
+  public function softDelete(int $id): void
   {
     $status = $this->table == 'orders' ? 'closed' : 'inactive';
     $stmt = $this->db->prepare("UPDATE {$this->table} SET status = :status WHERE code = :code");
     $stmt->execute([':code' => $id, ':status' => $status]);
   }
 
-  public function delete($id) {
+  public function delete(int $id): void {
     $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
   }
 
-  public function generateBusinessCode()
+  public function generateBusinessCode(): int
   {
     $status = $this->table === 'orders' ? 'open' : 'active';
     $table = $this->table === 'order_item' ? 'orders' : $this->table;
@@ -48,12 +49,12 @@ abstract class BaseModel
     return $stmt->fetchColumn();
   }
 
-  public function sanitize(string $string)
+  public function sanitize(string $string): string
   {
     return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
   }
 
-  public function nameExists(string $name)
+  public function nameExists(string $name): bool
   {
     $trimmedName = trim($name);
     $normalizedName = str_replace(' ', '', $trimmedName);
