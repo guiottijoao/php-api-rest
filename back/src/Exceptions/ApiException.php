@@ -8,6 +8,13 @@ use Exception;
 class ApiException extends Exception {
   private string $publicMessage;
 
+  /**
+   * @param string $publicMessage
+   * @param int $statusCode
+   * @param string $internalMessage
+   * @param Exception $previous
+   * @return void
+   */
   public function __construct(
     string $publicMessage,
     int $statusCode = 500,
