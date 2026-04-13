@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -8,16 +9,16 @@ use PDO;
 
 class Category extends BaseModel
 {
-  protected $table = 'categories';
+  protected string $table = 'categories';
 
-  public function __construct($db)
+  public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
   // não precisa criar função list() porque não precisa tratar e ja tem na classe pai
 
-  public function findById($id)
+  public function findById(int $id): array
   {
     $result = parent::findById($id);
     if (!$result) {
@@ -26,7 +27,7 @@ class Category extends BaseModel
     return $result;
   }
 
-  public function save($data)
+  public function save(array $data): array
   {
     $this->validate($data);
     $businessCode = parent::generateBusinessCode();
@@ -40,7 +41,7 @@ class Category extends BaseModel
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  public function delete($categoryId)
+  public function delete(int $categoryId): void
   {
     $check_existence_stmt = $this->db->prepare("SELECT code FROM categories WHERE code = :id");
     $check_existence_stmt->execute([":id" => $categoryId]);
@@ -48,19 +49,20 @@ class Category extends BaseModel
       throw new ApiException("Category not found.", 404);
     }
 
-    $associated_registers_stmt = $this->db->query(
+    $associated_registers_stmt = $this->db->prepare(
       "SELECT * FROM products p
-      WHERE p.category_code = '$categoryId'
+      WHERE p.category_code = :category_code
       AND p.status = 'active'"
     );
+    $associated_registers_stmt->execute([":category_code" => $categoryId]);
     if ($associated_registers_stmt->fetch()) {
       throw new ApiException("Can't delete, this item has associated registers.", 422);
     }
 
-    return parent::softDelete($categoryId);
+    parent::softDelete($categoryId);
   }
 
-  private function validate(array $data)
+  private function validate(array $data): void
   {
     $name = $data['name'];
     $tax = $data['tax'];
