@@ -18,6 +18,10 @@ class CategoryController
     $this->db = $db;
   }
 
+  /**
+   * @param int $id
+   * @return void
+   */
   public function index(?int $id = null): void
   {
     try {
@@ -33,6 +37,9 @@ class CategoryController
     }
   }
 
+  /**
+   * @return void
+   */
   public function store(): void
   {
     try {
@@ -65,6 +72,10 @@ class CategoryController
     }
   }
 
+  /**
+   * @param int $categoryId
+   * @return void
+   */
   public function delete(int $categoryId): void
   {
     try {

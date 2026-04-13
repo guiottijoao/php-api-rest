@@ -9,6 +9,9 @@ class Database
 {
   private static ?PDO $instance = null;
 
+  /**
+   * @return PDO
+   */
   public static function getConnection(): PDO
   {
     if (!self::$instance) {

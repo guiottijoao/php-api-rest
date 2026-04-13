@@ -18,6 +18,10 @@ class ProductsController
     $this->db = $db;
   }
 
+  /**
+   * @param int $id
+   * @return void
+   */
   public function index(?int $id = null): void
   {
     try {
@@ -33,6 +37,9 @@ class ProductsController
     }
   }
 
+  /**
+   * @return void
+   */
   public function store(): void
   {
     try {
@@ -67,6 +74,10 @@ class ProductsController
     }
   }
 
+  /**
+   * @param int $productId
+   * @return void
+   */
   public function delete(int $productId): void
   {
     try {

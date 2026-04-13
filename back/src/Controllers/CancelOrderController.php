@@ -10,7 +10,7 @@ use PDO;
 
 class CancelOrderController
 {
-  
+
   private PDO $db;
 
   public function __construct(PDO $db)
@@ -18,6 +18,10 @@ class CancelOrderController
     $this->db = $db;
   }
 
+  /**
+   * @param int $orderId
+   * @return void
+   */
   public function update(int $orderId): void
   {
     try {

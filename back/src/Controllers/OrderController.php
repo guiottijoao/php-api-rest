@@ -19,6 +19,10 @@ class OrderController
     $this->db = $db;
   }
 
+  /**
+   * @param int $id
+   * @return void
+   */
   public function index(?int $id = null): void
   {
     try {
@@ -39,6 +43,9 @@ class OrderController
     }
   }
 
+  /**
+   * @return void
+   */
   public function store(): void
   {
     try {
@@ -78,6 +85,10 @@ class OrderController
     }
   }
 
+  /**
+   * @param int $orderId
+   * @return void
+   */
   public function delete(int $orderId): void
   {
     try {
