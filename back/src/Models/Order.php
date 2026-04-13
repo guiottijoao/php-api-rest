@@ -31,7 +31,7 @@ class Order extends BaseModel
   }
 
   /**
-   * @param array<string, mixed>
+   * @param array<string, mixed> $data
    * @return array<string, mixed>
    */
   public function save(array $data): array
@@ -158,7 +158,7 @@ class Order extends BaseModel
   }
 
   /**
-   * @param array<string, mixed>
+   * @param array<string, mixed> $data
    * @return void
    */
   private function validate(array $data): void
