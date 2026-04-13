@@ -17,6 +17,10 @@ class Order extends BaseModel
     $this->db = $db;
   }
 
+  /**
+   * @param int $id
+   * @return array<string, mixed>
+   */
   public function findById(int $id): array
   {
     $result = parent::findById($id);
@@ -26,6 +30,10 @@ class Order extends BaseModel
     return $result;
   }
 
+  /**
+   * @param array<string, mixed>
+   * @return array<string, mixed>
+   */
   public function save(array $data): array
   {
     $this->validate($data);
@@ -49,6 +57,10 @@ class Order extends BaseModel
     return $result;
   }
 
+  /**
+   * @param $orderId
+   * @return void
+   */
   public function finish(int $orderId): void
   {
     $order_select_stmt = $this->db->prepare(
@@ -84,6 +96,10 @@ class Order extends BaseModel
     }
   }
 
+  /**
+   * @param int $orderId
+   * @return void
+   */
   public function cancel(int $orderId): void
   {
     $active_order_stmt = $this->db->prepare("SELECT *
@@ -112,6 +128,10 @@ class Order extends BaseModel
     $update_order_total_and_tax->execute([":order_code" => $order['code']]);
   }
 
+  /**
+   * @param int $orderId
+   * @return void
+   */
   public function delete(int $orderId): void
   {
     $check_existence_stmt = $this->db->prepare(
@@ -137,6 +157,10 @@ class Order extends BaseModel
     parent::softDelete($orderId);
   }
 
+  /**
+   * @param array<string, mixed>
+   * @return void
+   */
   private function validate(array $data): void
   {
     $total = $data['total'];
@@ -151,6 +175,10 @@ class Order extends BaseModel
     }
   }
 
+  /**
+   * @param int $orderId
+   * @return void
+   */
   private function discountStock(array $orderItem): void
   {
     $productId = $orderItem['product_code'];
