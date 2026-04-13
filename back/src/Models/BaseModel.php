@@ -16,6 +16,10 @@ abstract class BaseModel
     $this->db = $db;
   }
 
+  /**
+   * @param int $id
+   * @return array<string, mixed>|false
+   */
   public function findById(int $id): array|false
   {
     $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE code = :id");
@@ -23,12 +27,19 @@ abstract class BaseModel
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  /**
+   * @return<int, array<string, mixed>>
+   */
   public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  /**
+   * @param int $id
+   * @return void
+   */
   public function softDelete(int $id): void
   {
     $status = $this->table == 'orders' ? 'closed' : 'inactive';
@@ -36,12 +47,19 @@ abstract class BaseModel
     $stmt->execute([':code' => $id, ':status' => $status]);
   }
 
+  /**
+   * @param int $id
+   * @return void
+   */
   public function delete(int $id): void
   {
     $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
   }
 
+  /**
+   * @return int
+   */
   public function generateBusinessCode(): int
   {
     $status = $this->table === 'orders' ? 'open' : 'active';
@@ -55,11 +73,19 @@ abstract class BaseModel
     return $stmt->fetchColumn();
   }
 
+  /**
+   * @param string $string
+   * @return string
+   */
   public function sanitize(string $string): string
   {
     return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
   }
 
+  /**
+   * @param string $name
+   * @return bool
+   */
   public function nameExists(string $name): bool
   {
     $trimmedName = trim($name);
