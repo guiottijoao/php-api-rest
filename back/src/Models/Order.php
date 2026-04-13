@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Exceptions\ApiException;
@@ -8,14 +10,14 @@ use PDO;
 
 class Order extends BaseModel
 {
-  protected $table = 'orders';
+  protected string $table = 'orders';
 
   public function __construct(PDO $db)
   {
     $this->db = $db;
   }
 
-  public function findById($id)
+  public function findById(int $id): array
   {
     $result = parent::findById($id);
     if (!$result) {
@@ -24,7 +26,7 @@ class Order extends BaseModel
     return $result;
   }
 
-  public function save($data)
+  public function save(array $data): false
   {
     $this->validate($data);
 
@@ -32,10 +34,15 @@ class Order extends BaseModel
     $stmt = $this->db->prepare("INSERT INTO orders (total, tax, business_code) VALUES (:total, :tax, :business_code) RETURNING *");
 
     $stmt->execute([":total" => (float)$data['total'], ":tax" => (float)$data['tax'], ":business_code" => $businessCode]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$result) {
+      throw new ApiException("Failed to create order.", 500);
+    }
+    return $result;
   }
 
-  public function finish($orderId)
+  public function finish(int $orderId): void
   {
     $order_select_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
     $order_select_stmt->execute([":code" => $orderId]);
@@ -46,33 +53,38 @@ class Order extends BaseModel
       $order_item_select_stmt->execute([":order_code" => $openOrderId]);
       $orderItems = $order_item_select_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      if ($orderItems) {
-        foreach ($orderItems as $item) {
-          $this->discountStock($item);
-        }
-        $open_order_update_stmt = $this->db->prepare("UPDATE orders SET status = 'closed'");
-        return $open_order_update_stmt->execute();
+      if (!$orderItems) {
+        throw new ApiException("You dont have items in your order.");
       }
+
+      foreach ($orderItems as $item) {
+        $this->discountStock($item);
+      }
+
+      $open_order_update_stmt = $this->db->prepare("UPDATE orders SET status = 'closed'");
+      $open_order_update_stmt->execute();
     }
-    throw new ApiException("You dont have items in your order.");
   }
 
-  public function cancel($orderId) {
-      $active_order_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
-      $active_order_stmt->execute([":code" => $orderId]);
-      $order = $active_order_stmt->fetch(PDO::FETCH_ASSOC);
-      $order_items_stmt = $this->db->query("SELECT * FROM order_item");
-      $orderItems = $order_items_stmt->fetch(PDO::FETCH_ASSOC);
-      if (!$order || !$orderItems) return;
+  public function cancel(int $orderId): void
+  {
+    $active_order_stmt = $this->db->prepare("SELECT * FROM orders o WHERE o.code = :code AND o.status = 'open'");
+    $active_order_stmt->execute([":code" => $orderId]);
+    $order = $active_order_stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$order) throw new ApiException("Order not found.", 404);
 
-      $delete_order_items_stmt = $this->db->prepare("DELETE FROM order_item o WHERE o.order_code = :order_code");
-      $delete_order_items_stmt->execute([":order_code" => $order['code']]);
-      
-      $update_order_total_and_tax = $this->db->prepare("UPDATE orders o SET total = 0, tax = 0 WHERE  o.code = :order_code");
-      $update_order_total_and_tax->execute([":order_code" => $order['code']]);
+    $order_items_stmt = $this->db->query("SELECT * FROM order_item");
+    $orderItems = $order_items_stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!$orderItems) throw new ApiException("Order has no items.", 400);
+
+    $delete_order_items_stmt = $this->db->prepare("DELETE FROM order_item o WHERE o.order_code = :order_code");
+    $delete_order_items_stmt->execute([":order_code" => $order['code']]);
+
+    $update_order_total_and_tax = $this->db->prepare("UPDATE orders o SET total = 0, tax = 0 WHERE  o.code = :order_code");
+    $update_order_total_and_tax->execute([":order_code" => $order['code']]);
   }
 
-  public function delete($orderId)
+  public function delete(int $orderId): void
   {
     $check_existence_stmt = $this->db->prepare("SELECT code FROM orders WHERE code = :id");
     $check_existence_stmt->execute([":id" => $orderId]);
@@ -90,10 +102,10 @@ class Order extends BaseModel
       throw new ApiException("Can't delete, this item has associated registers.", 422);
     }
 
-    return parent::softDelete($orderId);
+    parent::softDelete($orderId);
   }
 
-  private function validate(array $data)
+  private function validate(array $data): void
   {
     $total = $data['total'];
     $tax = $data['tax'];
@@ -107,12 +119,12 @@ class Order extends BaseModel
     }
   }
 
-  private function discountStock(array $orderItem)
+  private function discountStock(array $orderItem): void
   {
     $productId = $orderItem['product_code'];
     $orderItemAmount = $orderItem['amount'];
 
     $discount_statement = $this->db->prepare("UPDATE products p SET amount = amount - :item_amount WHERE p.code = :product_code");
-    $discount_statement->execute([":item_amount" =>  $orderItemAmount, "product_code" => $productId]);
+    $discount_statement->execute([":item_amount" =>  $orderItemAmount, ":product_code" => $productId]);
   }
 }
