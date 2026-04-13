@@ -141,7 +141,7 @@ class OrderItem extends BaseModel
     $productCode = $data['product_code'];
     $amount = $data['amount'];
 
-    $product_stmt = $this->db->prepare("SELECT * FROM products WHERE code = :code");
+    $product_stmt = $this->db->prepare("SELECT * FROM products WHERE code = :code AND status = 'active'");
     $product_stmt->execute([":code" => $productCode]);
 
     if ($product_stmt->rowCount() === 0) throw new ApiException("Product doesn't exist.", 404);
@@ -171,7 +171,7 @@ class OrderItem extends BaseModel
     }
   }
 
-  public function generateOrderItemBusinessCode(): array
+  public function generateOrderItemBusinessCode(): int
   {
     $stmt = $this->db->prepare("SELECT COALESCE(MAX(business_code) + 1, 1) FROM order_item");
     $stmt->execute();
@@ -220,7 +220,7 @@ class OrderItem extends BaseModel
     return (float)$result;
   }
 
-  private function getOrderItemTotalPrice(float $totalTax, float $price, int $amount): float
+  private function getOrderItemTotalPrice(mixed $totalTax, mixed $price, int $amount): float
   {
     $result =  $totalTax + ($price * $amount);
     return (float)$result;
