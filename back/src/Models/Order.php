@@ -26,7 +26,7 @@ class Order extends BaseModel
     return $result;
   }
 
-  public function save(array $data): false
+  public function save(array $data): array
   {
     $this->validate($data);
 
