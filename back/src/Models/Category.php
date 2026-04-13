@@ -17,8 +17,10 @@ class Category extends BaseModel
     $this->db = $db;
   }
 
-  // não precisa criar função list() porque não precisa tratar e ja tem na classe pai
-
+  /**
+   * @param int $id
+   * @return array<int, mixed>
+   */
   public function findById(int $id): array
   {
     $result = parent::findById($id);
@@ -28,6 +30,10 @@ class Category extends BaseModel
     return $result;
   }
 
+  /**
+   * @param array<string, mixed>>
+   * @return array<string, mixed>
+   */
   public function save(array $data): array
   {
     $this->validate($data);
@@ -45,6 +51,10 @@ class Category extends BaseModel
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  /**
+   * @param int $categoryId
+   * @return void
+   */
   public function delete(int $categoryId): void
   {
     $check_existence_stmt = $this->db->prepare("SELECT code FROM categories WHERE code = :id");
@@ -66,6 +76,10 @@ class Category extends BaseModel
     parent::softDelete($categoryId);
   }
 
+  /**
+   * @param array<string, mixed>
+   * @return void
+   */
   private function validate(array $data): void
   {
     $name = $data['name'];
