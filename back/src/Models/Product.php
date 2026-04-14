@@ -88,11 +88,11 @@ class Product extends BaseModel
     $price = $data['price'];
     $categoryCode = $data['category_code'];
 
-    if (mb_strlen($name) > 20) {
+    if (mb_strlen($name) > $this->MAX_NAME_LEN) {
       throw new ApiException("Name cannot exceed 20 characters.");
     }
 
-    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)  || !preg_match('/\p{L}/u', $name)) {
+    if (!preg_match($this->SPECIAL_CHAR_REGEX, $name)  || !preg_match($this->CONTAIN_LETTER_REGEX, $name)) {
       throw new ApiException("Name can't contain special characters or be only numbers.", 400);
     }
 
@@ -100,13 +100,13 @@ class Product extends BaseModel
       throw new ApiException("Product with this name already exists.");
     }
 
-    if ($amount < 1 || $amount > 10000) {
+    if ($amount < $this->MIN_PRODUCT_AMOUNT || $amount > $this->MAX_PRODUCT_AMOUNT) {
       throw new ApiException(
         "Amount must be a number between 1 and 10000 (ten thousand)."
       );
     }
 
-    if ($price < 0.1 || $price > 1000000000) {
+    if ($price < $this->MIN_PRICE || $price > $this->MAX_PRICE) {
       throw new ApiException(
         "Price must be a number between 0.1 and 1000000000 (one billion)"
       );

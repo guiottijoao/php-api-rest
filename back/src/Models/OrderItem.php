@@ -238,7 +238,7 @@ class OrderItem extends BaseModel
     if ($product_stmt->rowCount() === 0) {
       throw new ApiException("Product doesn't exist.", 404);
     }
-    if ($amount < 1 || $amount > 10000 || !filter_var($amount, FILTER_VALIDATE_INT)) {
+    if ($amount < $this->MIN_PRODUCT_AMOUNT || $amount > $this->MAX_PRODUCT_AMOUNT || !filter_var($amount, FILTER_VALIDATE_INT)) {
       throw new ApiException(
         "Amount must be an integer number between 1 and 10000 (ten thousand).",
         400

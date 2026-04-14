@@ -73,7 +73,7 @@ class Category extends BaseModel
     $name = $data['name'];
     $tax = $data['tax'];
 
-    if (mb_strlen($name) > 20) {
+    if (mb_strlen($name) > $this->MAX_NAME_LEN) {
       throw new ApiException("Category name cannot exceed 20 characters.", 400);
     }
 
@@ -81,11 +81,11 @@ class Category extends BaseModel
       throw new ApiException("A category with this name already exists.", 409);
     }
 
-    if (!preg_match('/^[\p{L}\p{N}\s]+$/u', $name)  || !preg_match('/\p{L}/u', $name)) {
+    if (!preg_match($this->SPECIAL_CHAR_REGEX, $name)  || !preg_match($this->CONTAIN_LETTER_REGEX, $name)) {
       throw new ApiException("Name can't contain special characters or be only numbers.", 400);
     }
 
-    if (!is_numeric($tax) || $tax < 0 || $tax > 100) {
+    if (!is_numeric($tax) || $tax < $this->TAX_MIN_VAL || $tax > $this->TAX_MAX_VAL) {
       throw new ApiException("Tax must be a number between 0 and 100", 400);
     }
   }

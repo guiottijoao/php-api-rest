@@ -11,6 +11,20 @@ abstract class BaseModel
 {
   protected PDO $db;
   protected string $table;
+  protected int $MAX_NAME_LEN = 20;
+  protected string $SPECIAL_CHAR_REGEX = '/^[\p{L}\p{N}\s]+$/u';
+  protected string $CONTAIN_LETTER_REGEX = '/\p{L}/u';
+  protected int $TAX_MIN_VAL = 0;
+  protected int $TAX_MAX_VAL = 100;
+  protected int $MIN_PRODUCT_AMOUNT;
+  protected int $MAX_PRODUCT_AMOUNT;
+  protected float $MIN_PRICE = 0.1;
+  protected int $MAX_PRICE = 1000000000;
+  protected string $STATUS_ACTIVE = 'active';
+  protected string $STATUS_INACTIVE = 'inactive';
+  protected string $STATUS_OPEN = 'open';
+  protected string $STATUS_CLOSED = 'closed';
+  protected string $BLANK_SPACE_REGEX = '/\s+/';
 
   public function __construct(PDO $db)
   {
@@ -39,7 +53,7 @@ abstract class BaseModel
 
   public function softDelete(int $id): void
   {
-    $status = $this->table == 'orders' ? 'closed' : 'inactive';
+    $status = $this->table == 'orders' ? $this->STATUS_CLOSED : $this->STATUS_INACTIVE;
     $stmt = $this->db->prepare("UPDATE {$this->table} SET status = :status WHERE code = :code");
     $stmt->execute([':code' => $id, ':status' => $status]);
   }
@@ -52,7 +66,7 @@ abstract class BaseModel
 
   public function generateBusinessCode(): int
   {
-    $status = $this->table === 'orders' ? 'open' : 'active';
+    $status = $this->table === 'orders' ? $this->STATUS_OPEN : $this->STATUS_ACTIVE;
     $table = $this->table === 'order_item' ? 'orders' : $this->table;
     $stmt = $this->db->prepare(
       "SELECT COALESCE(MAX(business_code) + 1, 1)
@@ -65,7 +79,7 @@ abstract class BaseModel
 
   public function sanitize(string $string): string
   {
-    return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
+    return htmlspecialchars(preg_replace($this->BLANK_SPACE_REGEX, ' ', strip_tags(trim($string))));
   }
 
   public function nameExists(string $name): bool
@@ -76,10 +90,10 @@ abstract class BaseModel
     $stmt = $this->db->prepare(
       "SELECT COUNT(*)
     FROM {$this->table}
-    WHERE status = 'active'
+    WHERE status = :status
     AND LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)"
     );
-    $stmt->execute([':normalizedName' => $normalizedName]);
+    $stmt->execute([':normalizedName' => $normalizedName, ':status' => $this->STATUS_ACTIVE]);
     return $stmt->fetchColumn() > 0;
   }
 
@@ -104,24 +118,24 @@ abstract class BaseModel
         INNER JOIN orders o
         ON oi.order_code = o.code
         WHERE oi.product_code = :product_code
-        AND o.status = 'open'"
+        AND o.status = :status"
       );
 
-      $associated_registers_stmt->execute([':product_code' => $id]);
+      $associated_registers_stmt->execute([':product_code' => $id, ':status' => $this->STATUS_OPEN]);
     } else if ($table === 'categories') {
       $associated_registers_stmt = $this->db->prepare(
         "SELECT * FROM products p
       WHERE p.category_code = :category_code
-      AND p.status = 'active'"
+      AND p.status = :status"
       );
 
-      $associated_registers_stmt->execute([":category_code" => $id]);
+      $associated_registers_stmt->execute([":category_code" => $id, ':status' => $this->STATUS_ACTIVE]);
     } else {
       $associated_registers_stmt = $this->db->prepare(
         "SELECT * FROM order_item oi
       WHERE oi.order_code = :code"
       );
-      
+
       $associated_registers_stmt->execute([':code' => $id]);
     }
 
