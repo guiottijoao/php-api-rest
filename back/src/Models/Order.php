@@ -62,9 +62,9 @@ class Order extends BaseModel
     $order_select_stmt = $this->db->prepare(
       "SELECT * FROM orders o
       WHERE o.code = :code
-      AND o.status = 'open'"
+      AND o.status = :status"
     );
-    $order_select_stmt->execute([":code" => $orderId]);
+    $order_select_stmt->execute([":code" => $orderId, ":status" => $this->STATUS_OPEN]);
     $openOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
     if ($openOrder) {
       $openOrderId = $openOrder['code'];
@@ -86,9 +86,9 @@ class Order extends BaseModel
 
       $open_order_update_stmt = $this->db->prepare(
         "UPDATE orders
-        SET status = 'closed'"
+        SET status = :status"
       );
-      $open_order_update_stmt->execute();
+      $open_order_update_stmt->execute([":status" => $this->STATUS_CLOSED]);
     }
   }
 
@@ -97,8 +97,8 @@ class Order extends BaseModel
     $active_order_stmt = $this->db->prepare("SELECT *
     FROM orders o
     WHERE o.code = :code
-    AND o.status = 'open'");
-    $active_order_stmt->execute([":code" => $orderId]);
+    AND o.status = :status");
+    $active_order_stmt->execute([":code" => $orderId, ":status" => $this->STATUS_OPEN]);
     $order = $active_order_stmt->fetch(PDO::FETCH_ASSOC);
     if (!$order) throw new ApiException("Order not found.", 404);
 

@@ -73,10 +73,11 @@ class OrderItem extends BaseModel
     $this->validate($data);
 
     $activeOrder = [];
-    $order_select_stmt = $this->db->query(
+    $order_select_stmt = $this->db->prepare(
       "SELECT * FROM orders
-      WHERE status = 'open'"
+      WHERE status = :status"
     );
+    $order_select_stmt->execute([":status" => $this->STATUS_OPEN]);
     $productId = $data['product_code'];
 
     $categoryTax = $this->orderItemService->getCategoryTax($productId);
@@ -104,7 +105,7 @@ class OrderItem extends BaseModel
     $order_update_stmt = $this->db->prepare(
       "UPDATE orders o
       SET total = :total, tax = :tax
-      WHERE status = 'open'"
+      WHERE status = :status"
     );
 
     $activeOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
@@ -123,11 +124,12 @@ class OrderItem extends BaseModel
         ":tax" => $orderItemTotalTax,
         ":business_code" => parent::generateBusinessCode()
       ]);
-      $order_select_stmt = $this->db->query(
+      $order_select_stmt = $this->db->prepare(
         "SELECT *
         FROM orders o
-        WHERE o.status = 'open'"
+        WHERE o.status = :status"
       );
+      $activeOrder->execute([":status" => $this->STATUS_OPEN]);
       $activeOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
 
       $insert_item_stmt->execute([
@@ -151,7 +153,8 @@ class OrderItem extends BaseModel
       $orderTotalTax = $activeOrder['tax'] + $orderItemTotalTax;
       $order_update_stmt->execute([
         ":total" => $orderTotalPrice,
-        ":tax" => $orderTotalTax
+        ":tax" => $orderTotalTax,
+        ":status" => $this->STATUS_OPEN
       ]);
 
       if ($orderItems && $this->orderItemService->isOrderItemRepeated($productId, $activeOrder['code'])) {
@@ -231,9 +234,9 @@ class OrderItem extends BaseModel
       "SELECT *
       FROM products
       WHERE code = :code
-      AND status = 'active'"
+      AND status = :status"
     );
-    $product_stmt->execute([":code" => $productCode]);
+    $product_stmt->execute([":code" => $productCode, ":status" => $this->STATUS_ACTIVE]);
 
     if ($product_stmt->rowCount() === 0) {
       throw new ApiException("Product doesn't exist.", 404);

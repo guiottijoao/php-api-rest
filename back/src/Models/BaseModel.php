@@ -20,13 +20,13 @@ abstract class BaseModel
   protected int $MAX_PRODUCT_AMOUNT;
   protected float $MIN_PRICE = 0.1;
   protected int $MAX_PRICE = 1000000000;
-  protected string $STATUS_ACTIVE = 'active';
-  protected string $STATUS_INACTIVE = 'inactive';
-  protected string $STATUS_OPEN = 'open';
-  protected string $STATUS_CLOSED = 'closed';
-  protected string $BLANK_SPACE_REGEX = '/\s+/';
   protected string $BUSINESS_CODE_SEQUENCE = 'COALESCE(MAX(business_code) + 1, 1';
-
+  protected string $BLANK_SPACE_REGEX = '/\s+/';
+  public string $STATUS_ACTIVE = 'active';
+  public string $STATUS_INACTIVE = 'inactive';
+  public string $STATUS_OPEN = 'open';
+  public string $STATUS_CLOSED = 'closed';
+  
   public function __construct(PDO $db)
   {
     $this->db = $db;

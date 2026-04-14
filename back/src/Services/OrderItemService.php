@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exceptions\ApiException;
+use App\Models\BaseModel;
 use PDO;
 
 class OrderItemService
@@ -120,13 +121,14 @@ class OrderItemService
    */
   public function verifyStockAvailability(int $productId, array $orderItem): bool
   {
+    $baseModel = new BaseModel($this->db);
     $existing_item_amount_stmt = $this->db->prepare(
       "SELECT amount
       FROM order_item oi
       INNER JOIN orders o
       ON oi.order_code = o.code
       WHERE oi.product_code = :product_code
-      AND o.status = 'open'"
+      AND o.status = :status"
     );
     $product_stmt = $this->db->prepare(
       "SELECT *
@@ -137,7 +139,8 @@ class OrderItemService
     $product = $product_stmt->fetch(PDO::FETCH_ASSOC);
 
     $existing_item_amount_stmt->execute([
-      ":product_code" => $orderItem['product_code']
+      ":product_code" => $orderItem['product_code'],
+      ":status" => $baseModel->STATUS_OPEN
     ]);
     $existingItemAmount = $existing_item_amount_stmt->fetchColumn();
     if ($product['amount'] < $orderItem['amount'] + $existingItemAmount) {
