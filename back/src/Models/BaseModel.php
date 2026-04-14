@@ -37,10 +37,6 @@ abstract class BaseModel
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  /**
-   * @param int $id
-   * @return void
-   */
   public function softDelete(int $id): void
   {
     $status = $this->table == 'orders' ? 'closed' : 'inactive';
@@ -48,19 +44,12 @@ abstract class BaseModel
     $stmt->execute([':code' => $id, ':status' => $status]);
   }
 
-  /**
-   * @param int $id
-   * @return void
-   */
   public function hardDelete(int $id): void
   {
     $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE code = :id");
     $stmt->execute([':id' => $id]);
   }
 
-  /**
-   * @return int
-   */
   public function generateBusinessCode(): int
   {
     $status = $this->table === 'orders' ? 'open' : 'active';
@@ -74,19 +63,11 @@ abstract class BaseModel
     return $stmt->fetchColumn();
   }
 
-  /**
-   * @param string $string
-   * @return string
-   */
   public function sanitize(string $string): string
   {
     return htmlspecialchars(preg_replace('/\s+/', ' ', strip_tags(trim($string))));
   }
 
-  /**
-   * @param string $name
-   * @return bool
-   */
   public function nameExists(string $name): bool
   {
     $trimmedName = trim($name);
@@ -102,10 +83,6 @@ abstract class BaseModel
     return $stmt->fetchColumn() > 0;
   }
 
-  /**
-   * @param int $id
-   * @return void
-   */
   public function verifyExistence(int $id): void
   {
     $check_existence_stmt = $this->db->prepare(
@@ -119,11 +96,6 @@ abstract class BaseModel
     }
   }
 
-  /**
-   * @param int $id
-   * @param string $table
-   * @return void
-   */
   public function verifyAssociatedRegisters(int $id, string $table): void
   {
     if ($table === 'products') {

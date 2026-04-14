@@ -57,10 +57,6 @@ class Order extends BaseModel
     return $result;
   }
 
-  /**
-   * @param $orderId
-   * @return void
-   */
   public function finish(int $orderId): void
   {
     $order_select_stmt = $this->db->prepare(
@@ -96,10 +92,6 @@ class Order extends BaseModel
     }
   }
 
-  /**
-   * @param int $orderId
-   * @return void
-   */
   public function cancel(int $orderId): void
   {
     $active_order_stmt = $this->db->prepare("SELECT *
@@ -128,10 +120,6 @@ class Order extends BaseModel
     $update_order_total_and_tax->execute([":order_code" => $order['code']]);
   }
 
-  /**
-   * @param int $orderId
-   * @return void
-   */
   public function delete(int $orderId): void
   {
     parent::verifyExistence($orderId);
@@ -159,10 +147,6 @@ class Order extends BaseModel
     }
   }
 
-  /**
-   * @param int $orderId
-   * @return void
-   */
   private function discountStock(array $orderItem): void
   {
     $productId = $orderItem['product_code'];

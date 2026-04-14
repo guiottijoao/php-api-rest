@@ -68,10 +68,6 @@ class Product extends BaseModel
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  /**
-   * @param int $productId
-   * @return void
-   */
   public function delete(int $productId): void
   {
     parent::verifyExistence($productId);
@@ -127,10 +123,6 @@ class Product extends BaseModel
     }
   }
 
-  /**
-   * @param int $id
-   * @return float
-   */
   private function getTaxById(int $id): float
   {
     $stmt = $this->db->prepare(

@@ -209,10 +209,6 @@ class OrderItem extends BaseModel
     }
   }
 
-  /**
-   * @param int $orderItemId
-   * @return void
-   */
   public function delete(int $orderItemId): void
   {
     $this->orderService->calculateOrderWhenItemDeleted($orderItemId);
@@ -264,9 +260,6 @@ class OrderItem extends BaseModel
     }
   }
 
-  /**
-   * @return int
-   */
   public function generateOrderItemBusinessCode(): int
   {
     $stmt = $this->db->prepare(
