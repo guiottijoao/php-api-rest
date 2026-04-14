@@ -15,6 +15,8 @@ class Product extends BaseModel
   public function __construct(PDO $db)
   {
     $this->db = $db;
+
+    parent::__construct($db);
   }
 
   /**

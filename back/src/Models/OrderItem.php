@@ -21,6 +21,8 @@ class OrderItem extends BaseModel
     $this->db = $db;
     $this->orderService = new OrderService($db);
     $this->orderItemService = new OrderItemService($db);
+
+    parent::__construct($db);
   }
 
   /**
@@ -129,7 +131,7 @@ class OrderItem extends BaseModel
         FROM orders o
         WHERE o.status = :status"
       );
-      $activeOrder->execute([":status" => $this->STATUS_OPEN]);
+      $order_select_stmt->execute([":status" => $this->STATUS_OPEN]);
       $activeOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
 
       $insert_item_stmt->execute([
