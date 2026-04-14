@@ -137,7 +137,7 @@ class OrderItem extends BaseModel
       $insert_item_stmt->execute([
         ":order_code" => $activeOrder['code'],
         ":product_code" => $productId,
-        "amount" => $productAmount,
+        ":amount" => $productAmount,
         ":price" => $productPrice,
         ":tax" => $orderItemTotalTax,
         ":business_code" => $this->generateOrderItemBusinessCode()
@@ -199,7 +199,7 @@ class OrderItem extends BaseModel
       $insert_item_stmt->execute([
         ":order_code" => $activeOrder['code'],
         ":product_code" => $productId,
-        "amount" => $productAmount,
+        ":amount" => $productAmount,
         ":price" => $productPrice,
         ":tax" => $orderItemTotalTax,
         ":business_code" => $this->generateOrderItemBusinessCode()

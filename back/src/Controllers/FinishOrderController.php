@@ -31,7 +31,9 @@ class FinishOrderController
       $model->finish($orderId);
       echo json_encode(["message" => "Order finished successfully."]);
     } catch (ApiException $e) {
-      throw $e;
+      $code = $e->getCode() ?: 500;
+      http_response_code($code);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 }
