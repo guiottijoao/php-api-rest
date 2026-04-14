@@ -31,7 +31,9 @@ class CancelOrderController
       $model->cancel($orderId);
       echo json_encode(["message" => "Order cancelled successfully."]);
     } catch (ApiException $e) {
-      throw $e;
+      $code = (int)$e->getCode() ?: 500;
+      http_response_code($code);
+      echo json_encode(["message" => $e->getPublicMessage()]);
     }
   }
 }
