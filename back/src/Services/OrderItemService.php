@@ -63,7 +63,6 @@ class OrderItemService
     int $amount
   ): float {
     return $result = ($taxPercent / 100) * $unitPrice * $amount;
-    return (float)$result;
   }
 
   /**
