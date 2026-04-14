@@ -43,12 +43,12 @@ $controllers = require __DIR__ . '/Config/routes.php';
 
 if (isset($controllers[$route])) {
   $controllerName = $controllers[$route];
-  $controller = new $controllerName($db);
 
-  if (!isset($controller)) {
+  if (!class_exists($controllerName)) {
     http_response_code(404);
     echo json_encode(["message" => "Controller not found"]);
   }
+  $controller = new $controllerName($db);
 
   $action = $actions[$method];
 
