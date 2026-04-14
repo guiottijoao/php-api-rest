@@ -25,6 +25,7 @@ abstract class BaseModel
   protected string $STATUS_OPEN = 'open';
   protected string $STATUS_CLOSED = 'closed';
   protected string $BLANK_SPACE_REGEX = '/\s+/';
+  protected string $BUSINESS_CODE_SEQUENCE = 'COALESCE(MAX(business_code) + 1, 1';
 
   public function __construct(PDO $db)
   {
@@ -69,7 +70,7 @@ abstract class BaseModel
     $status = $this->table === 'orders' ? $this->STATUS_OPEN : $this->STATUS_ACTIVE;
     $table = $this->table === 'order_item' ? 'orders' : $this->table;
     $stmt = $this->db->prepare(
-      "SELECT COALESCE(MAX(business_code) + 1, 1)
+      "SELECT {$this->BUSINESS_CODE_SEQUENCE})
     FROM {$table}
     WHERE status = :status"
     );
