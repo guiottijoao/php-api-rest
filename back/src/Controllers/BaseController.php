@@ -97,6 +97,7 @@ abstract class BaseController
   public function delete(int $id): void
   {
     try {
+      header('Content-Type: application/json');
       $modelClass = "App\\Models\\{$this->model}";
       $model = new $modelClass($this->db);
       $model->delete($id);
