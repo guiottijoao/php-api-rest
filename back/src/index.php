@@ -1,16 +1,11 @@
 <?php
 
 use App\Config\Database;
-use App\Controllers\CategoryController;
-use App\Controllers\ProductsController;
-use App\Controllers\OrderItemController;
-use App\Controllers\CancelOrderController;
-use App\Controllers\FinishOrderController;
-use App\Controllers\OrderController;
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
 
 spl_autoload_register(function ($class) {
   $baseDir = __DIR__ . '/';
@@ -44,15 +39,7 @@ $actions = [
   'DELETE' => 'delete'
 ];
 
-// route => controller
-$controllers = [
-  'categories' => CategoryController::class,
-  'products' => ProductsController::class,
-  'orders' => OrderController::class,
-  'finish-order' => FinishOrderController::class,
-  'cancel-order' => CancelOrderController::class,
-  'order-items' => OrderItemController::class,
-];
+$controllers = require __DIR__ . '/Config/routes.php';
 
 if (isset($controllers[$route])) {
   $controllerName = $controllers[$route];
