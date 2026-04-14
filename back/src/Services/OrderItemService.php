@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exceptions\ApiException;
-use App\Models\BaseModel;
 use PDO;
 
 class OrderItemService
@@ -17,6 +16,8 @@ class OrderItemService
   {
     $this->db = $db;
   }
+
+  public string $STATUS_OPEN = 'open';
 
   /**
    * @param int $productId
@@ -121,7 +122,6 @@ class OrderItemService
    */
   public function verifyStockAvailability(int $productId, array $orderItem): bool
   {
-    $baseModel = new BaseModel($this->db);
     $existing_item_amount_stmt = $this->db->prepare(
       "SELECT amount
       FROM order_item oi
@@ -140,7 +140,7 @@ class OrderItemService
 
     $existing_item_amount_stmt->execute([
       ":product_code" => $orderItem['product_code'],
-      ":status" => $baseModel->STATUS_OPEN
+      ":status" => $this->STATUS_OPEN
     ]);
     $existingItemAmount = $existing_item_amount_stmt->fetchColumn();
     if ($product['amount'] < $orderItem['amount'] + $existingItemAmount) {
