@@ -78,6 +78,16 @@ abstract class BaseModel
     return $stmt->fetchColumn();
   }
 
+  public function generateOrderItemBusinessCode(): int
+  {
+    $stmt = $this->db->prepare(
+      "SELECT COALESCE(MAX(business_code) + 1, 1)
+    FROM order_item"
+    );
+    $stmt->execute();
+    return $stmt->fetchColumn();
+  }
+
   public function sanitize(string $string): string
   {
     return htmlspecialchars(preg_replace($this->BLANK_SPACE_REGEX, ' ', strip_tags(trim($string))));

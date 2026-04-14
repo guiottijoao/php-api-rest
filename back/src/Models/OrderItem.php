@@ -264,14 +264,4 @@ class OrderItem extends BaseModel
       throw new ApiException("Product does not exist.", 404);
     }
   }
-
-  public function generateOrderItemBusinessCode(): int
-  {
-    $stmt = $this->db->prepare(
-      "SELECT COALESCE(MAX(business_code) + 1, 1)
-    FROM order_item"
-    );
-    $stmt->execute();
-    return $stmt->fetchColumn();
-  }
 }
