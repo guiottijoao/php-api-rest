@@ -16,16 +16,16 @@ abstract class BaseModel
   protected string $CONTAIN_LETTER_REGEX = '/\p{L}/u';
   protected int $TAX_MIN_VAL = 0;
   protected int $TAX_MAX_VAL = 100;
-  protected int $MIN_PRODUCT_AMOUNT;
-  protected int $MAX_PRODUCT_AMOUNT;
+  protected int $MIN_PRODUCT_AMOUNT = 1;
+  protected int $MAX_PRODUCT_AMOUNT = 10000;
   protected float $MIN_PRICE = 0.1;
   protected int $MAX_PRICE = 1000000000;
   protected string $BUSINESS_CODE_SEQUENCE = 'COALESCE(MAX(business_code) + 1, 1';
   protected string $BLANK_SPACE_REGEX = '/\s+/';
-  public string $STATUS_ACTIVE = 'active';
-  public string $STATUS_INACTIVE = 'inactive';
-  public string $STATUS_OPEN = 'open';
-  public string $STATUS_CLOSED = 'closed';
+  protected string $STATUS_ACTIVE = 'active';
+  protected string $STATUS_INACTIVE = 'inactive';
+  protected string $STATUS_OPEN = 'open';
+  protected string $STATUS_CLOSED = 'closed';
   
   public function __construct(PDO $db)
   {
