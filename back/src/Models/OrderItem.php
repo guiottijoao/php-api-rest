@@ -167,29 +167,17 @@ class OrderItem extends BaseModel
       );
     }
 
-    $verify_associated_product_existence = $this->db->prepare(
-      "SELECT COUNT(*)
-    FROM products
-    WHERE code = :product_code"
-    );
-
-    $verify_associated_product_existence->execute([":product_code" => $productCode]);
-
     $this->orderItemService->verifyStockAvailability($data['product_code'], $data);
-
-    if (!$verify_associated_product_existence->fetchColumn()) {
-      throw new ApiException("Product does not exist.", 404);
-    }
   }
 
-  private function appendTotal(array $item): array
+  private function appendTotal(array $item): float
   {
-    $item['total'] = $this->orderItemService->getOrderItemTotalPrice(
+    $itemTotal = $this->orderItemService->getOrderItemTotalPrice(
       $item['tax'],
       $item['price'],
       $item['amount']
     );
 
-    return $item;
+    return $itemTotal;
   }
 }
