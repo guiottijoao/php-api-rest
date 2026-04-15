@@ -91,7 +91,7 @@ class Product extends BaseModel
     $categoryCode = $data['category_code'];
 
     if (mb_strlen($name) > $this->MAX_NAME_LEN) {
-      throw new ApiException("Name cannot exceed 20 characters.");
+      throw new ApiException("Name cannot exceed {$this->MAX_NAME_LEN} characters.");
     }
 
     if (!preg_match($this->SPECIAL_CHAR_REGEX, $name)  || !preg_match($this->CONTAIN_LETTER_REGEX, $name)) {

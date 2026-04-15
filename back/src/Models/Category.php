@@ -74,7 +74,7 @@ class Category extends BaseModel
     $tax = $data['tax'];
 
     if (mb_strlen($name) > $this->MAX_NAME_LEN) {
-      throw new ApiException("Category name cannot exceed 20 characters.", 400);
+      throw new ApiException("Category name cannot exceed {$this->MAX_NAME_LEN} characters.", 400);
     }
 
     if (parent::nameExists($name)) {
