@@ -118,7 +118,7 @@ abstract class BaseModel
     }
   }
 
-  public function verifyAssociatedRegisters(int $id, string $table): void
+  public function hasAssociatedRecord(int $id, string $table): void
   {
     if ($table === 'products') {
       $associated_registers_stmt = $this->db->prepare(

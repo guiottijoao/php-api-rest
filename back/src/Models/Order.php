@@ -130,7 +130,7 @@ class Order extends BaseModel
   {
     parent::verifyExistence($orderId);
 
-    parent::verifyAssociatedRegisters($orderId, 'orders');
+    parent::hasAssociatedRecord($orderId, 'orders');
 
     parent::softDelete($orderId);
   }

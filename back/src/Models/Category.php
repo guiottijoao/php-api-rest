@@ -59,7 +59,7 @@ class Category extends BaseModel
   {
     parent::verifyExistence($categoryId);
 
-    parent::verifyAssociatedRegisters($categoryId, 'categories');
+    parent::hasAssociatedRecord($categoryId, 'categories');
 
     parent::softDelete($categoryId);
   }

@@ -74,7 +74,7 @@ class Product extends BaseModel
   {
     parent::verifyExistence($productId);
 
-    parent::verifyAssociatedRegisters($productId, 'products');
+    parent::hasAssociatedRecord($productId, 'products');
 
     parent::softDelete($productId);
   }
