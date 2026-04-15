@@ -13,6 +13,7 @@ abstract class BaseController
 
   protected PDO $db;
   protected string $model;
+  protected string $service = '';
 
   public function __construct(PDO $db)
   {
@@ -67,10 +68,18 @@ abstract class BaseController
       }
 
       $modelClass = "App\\Models\\{$this->model}";
-      $model = new $modelClass($this->db);
-
-      $result = $model->save($data);
       $modelName = explode("\\", $modelClass)[2];
+
+      if ($this->service === 'CreateOrderItemService') {
+        $serviceClass = "App\\Services\\{$this->service}";
+        $service = new $serviceClass($this->db);
+
+        $result = $service->addItemToOrder($data);
+      } else {
+        $model = new $modelClass($this->db);
+        $result = $model->save($data);
+      }
+
 
       if ($result) {
         http_response_code(201);

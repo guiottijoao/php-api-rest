@@ -11,6 +11,7 @@ class OrderItemController extends BaseController
 {
 
   protected string $model = 'OrderItem';
+  protected string $service = 'CreateOrderItemService';
 
   public function __construct(PDO $db)
   {

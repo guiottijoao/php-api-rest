@@ -105,7 +105,8 @@ class Order extends BaseModel
 
     $order_items_stmt = $this->db->prepare(
       "SELECT * FROM order_item
-      WHERE order_code = :order_code");
+      WHERE order_code = :order_code"
+    );
     $order_items_stmt->execute([":order_code" => $orderId]);
     $orderItems = $order_items_stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!$orderItems) throw new ApiException("Order has no items.", 400);
@@ -129,7 +130,7 @@ class Order extends BaseModel
     parent::verifyExistence($orderId);
 
     parent::verifyAssociatedRegisters($orderId, 'orders');
-    
+
     parent::softDelete($orderId);
   }
 
@@ -165,6 +166,47 @@ class Order extends BaseModel
     $discount_statement->execute([
       ":item_amount" =>  $orderItemAmount,
       ":product_code" => $productId
+    ]);
+  }
+
+  /**
+   * @return array<string, mixed>|false
+   */
+  public function findOpenOrder(): array|false
+  {
+    $order_select_stmt = $this->db->prepare(
+      "SELECT * FROM orders
+      WHERE status = :status"
+    );
+    $order_select_stmt->execute([":status" => $this->STATUS_OPEN]);
+    return $order_select_stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public function insertNewOrder(float $itemTotalPrice, float $itemTotalTax): void
+  {
+    $order_insert_stmt = $this->db->prepare(
+      "INSERT INTO orders (total, tax, business_code)
+      VALUES (:total, :tax, :business_code)"
+    );
+    $order_insert_stmt->execute([
+      ":total" => $itemTotalPrice,
+      ":tax" => $itemTotalTax,
+      ":business_code" => parent::generateBusinessCode()
+    ]);
+  }
+
+  public function updateOrder(float $totalPrice, float $totalTax, string $status): void
+  {
+    $order_update_stmt = $this->db->prepare(
+      "UPDATE orders o
+        SET total = :total, tax = :tax
+        WHERE status = :status"
+    );
+
+    $order_update_stmt->execute([
+      ":total" => $totalPrice,
+      ":tax" => $totalTax,
+      ":status" => $status
     ]);
   }
 }
