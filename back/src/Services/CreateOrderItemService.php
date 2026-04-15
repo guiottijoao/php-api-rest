@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exceptions\ApiException;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\OrderItemService;
@@ -13,6 +14,7 @@ use PDO;
 class CreateOrderItemService
 {
 
+  private Category $category;
   private Order $order;
   private OrderItem $orderItem;
   private OrderItemService $orderItemService;
@@ -21,6 +23,7 @@ class CreateOrderItemService
   public function __construct(PDO $db)
   {
     $this->db = $db;
+    $this->category = new Category($db);
     $this->order = new Order($db);
     $this->orderItem = new OrderItem($db);
     $this->orderItemService = new OrderItemService($db);
@@ -33,7 +36,7 @@ class CreateOrderItemService
     $activeOrder = $this->order->findOpenOrder();
     $productId = $data['product_code'];
 
-    $categoryTax = $this->orderItemService->getCategoryTax($productId);
+    $categoryTax = $this->category->getCategoryTax($productId);
     $productAmount = $data['amount'];
     $productPrice = $this->orderItemService->getProductPrice($productId);
     $orderItemTotalTax = $this->orderItemService->calculateItemTotalTax(

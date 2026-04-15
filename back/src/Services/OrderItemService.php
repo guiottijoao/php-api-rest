@@ -18,27 +18,6 @@ class OrderItemService
     $this->db = $db;
   }
 
-  /**
-   * @param int $productId
-   * @return float
-   */
-  public function getCategoryTax(int $productId): float
-  {
-    $searchCategoryTaxStmt = $this->db->prepare(
-      "SELECT c.tax
-      FROM categories c
-      INNER JOIN products p
-      ON c.code = p.category_code
-      WHERE p.code = :product_code"
-    );
-    $searchCategoryTaxStmt->execute([":product_code" => $productId]);
-    return (float)$searchCategoryTaxStmt->fetchColumn();
-  }
-
-  /**
-   * @param int @productId
-   * @return float
-   */
   public function getProductPrice(int $productId): float
   {
     $searchProductPrice = $this->db->prepare(

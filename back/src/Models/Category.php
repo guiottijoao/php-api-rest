@@ -89,4 +89,17 @@ class Category extends BaseModel
       throw new ApiException("Tax must be a number between 0 and 100", 400);
     }
   }
+
+  public function getCategoryTax(int $productId): float
+  {
+    $searchCategoryTaxStmt = $this->db->prepare(
+      "SELECT c.tax
+      FROM categories c
+      INNER JOIN products p
+      ON c.code = p.category_code
+      WHERE p.code = :product_code"
+    );
+    $searchCategoryTaxStmt->execute([":product_code" => $productId]);
+    return (float)$searchCategoryTaxStmt->fetchColumn();
+  }
 }
