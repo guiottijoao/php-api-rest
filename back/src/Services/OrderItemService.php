@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use PDO;
 
@@ -16,8 +17,6 @@ class OrderItemService
   {
     $this->db = $db;
   }
-
-  public string $STATUS_OPEN = 'open';
 
   /**
    * @param int $productId
@@ -139,7 +138,7 @@ class OrderItemService
 
     $existing_item_amount_stmt->execute([
       ":product_code" => $orderItem['product_code'],
-      ":status" => $this->STATUS_OPEN
+      ":status" => Status::OPEN
     ]);
     $existingItemAmount = $existing_item_amount_stmt->fetchColumn();
     if ($product['amount'] < $orderItem['amount'] + $existingItemAmount) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Models\BaseModel;
 use PDO;
@@ -64,7 +65,7 @@ class Order extends BaseModel
       WHERE o.code = :code
       AND o.status = :status"
     );
-    $order_select_stmt->execute([":code" => $orderId, ":status" => $this->STATUS_OPEN]);
+    $order_select_stmt->execute([":code" => $orderId, ":status" => Status::OPEN]);
     $openOrder = $order_select_stmt->fetch(PDO::FETCH_ASSOC);
     if ($openOrder) {
       $openOrderId = $openOrder['code'];
@@ -89,7 +90,7 @@ class Order extends BaseModel
         SET status = :status
         WHERE code = :code"
       );
-      $open_order_update_stmt->execute([":status" => $this->STATUS_CLOSED, ":code" => $orderId]);
+      $open_order_update_stmt->execute([":status" => Status::CLOSED, ":code" => $orderId]);
     }
   }
 
@@ -99,7 +100,7 @@ class Order extends BaseModel
     FROM orders o
     WHERE o.code = :code
     AND o.status = :status");
-    $active_order_stmt->execute([":code" => $orderId, ":status" => $this->STATUS_OPEN]);
+    $active_order_stmt->execute([":code" => $orderId, ":status" => Status::OPEN]);
     $order = $active_order_stmt->fetch(PDO::FETCH_ASSOC);
     if (!$order) throw new ApiException("Order not found.", 404);
 
@@ -178,7 +179,7 @@ class Order extends BaseModel
       "SELECT * FROM orders
       WHERE status = :status"
     );
-    $order_select_stmt->execute([":status" => $this->STATUS_OPEN]);
+    $order_select_stmt->execute([":status" => Status::OPEN]);
     return $order_select_stmt->fetch(PDO::FETCH_ASSOC);
   }
 

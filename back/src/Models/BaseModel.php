@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use PDO;
 
@@ -22,10 +23,6 @@ abstract class BaseModel
   protected int $MAX_PRICE = 1000000000;
   protected string $BUSINESS_CODE_SEQUENCE = 'COALESCE(MAX(business_code) + 1, 1';
   protected string $BLANK_SPACE_REGEX = '/\s+/';
-  protected string $STATUS_ACTIVE = 'active';
-  protected string $STATUS_INACTIVE = 'inactive';
-  protected string $STATUS_OPEN = 'open';
-  protected string $STATUS_CLOSED = 'closed';
   
   public function __construct(PDO $db)
   {
@@ -54,7 +51,7 @@ abstract class BaseModel
 
   public function softDelete(int $id): void
   {
-    $status = $this->table == 'orders' ? $this->STATUS_CLOSED : $this->STATUS_INACTIVE;
+    $status = $this->table == 'orders' ? Status::CLOSED : Status::INACTIVE;
     $stmt = $this->db->prepare("UPDATE {$this->table} SET status = :status WHERE code = :code");
     $stmt->execute([':code' => $id, ':status' => $status]);
   }
@@ -67,7 +64,7 @@ abstract class BaseModel
 
   public function generateBusinessCode(): int
   {
-    $status = $this->table === 'orders' ? $this->STATUS_OPEN : $this->STATUS_ACTIVE;
+    $status = $this->table === 'orders' ? Status::OPEN : Status::ACTIVE;
     $table = $this->table === 'order_item' ? 'orders' : $this->table;
     $stmt = $this->db->prepare(
       "SELECT {$this->BUSINESS_CODE_SEQUENCE})
@@ -104,7 +101,7 @@ abstract class BaseModel
     WHERE status = :status
     AND LOWER(REPLACE(name, ' ', '')) = LOWER(:normalizedName)"
     );
-    $stmt->execute([':normalizedName' => $normalizedName, ':status' => $this->STATUS_ACTIVE]);
+    $stmt->execute([':normalizedName' => $normalizedName, ':status' => Status::ACTIVE]);
     return $stmt->fetchColumn() > 0;
   }
 
@@ -132,7 +129,7 @@ abstract class BaseModel
         AND o.status = :status"
       );
 
-      $associated_registers_stmt->execute([':product_code' => $id, ':status' => $this->STATUS_OPEN]);
+      $associated_registers_stmt->execute([':product_code' => $id, ':status' => Status::OPEN]);
     } else if ($table === 'categories') {
       $associated_registers_stmt = $this->db->prepare(
         "SELECT * FROM products p
@@ -140,7 +137,7 @@ abstract class BaseModel
       AND p.status = :status"
       );
 
-      $associated_registers_stmt->execute([":category_code" => $id, ':status' => $this->STATUS_ACTIVE]);
+      $associated_registers_stmt->execute([":category_code" => $id, ':status' => Status::OPEN]);
     } else {
       $associated_registers_stmt = $this->db->prepare(
         "SELECT * FROM order_item oi

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Models\BaseModel;
 use App\Services\OrderItemService;
@@ -154,7 +155,7 @@ class OrderItem extends BaseModel
       WHERE code = :code
       AND status = :status"
     );
-    $product_stmt->execute([":code" => $productCode, ":status" => $this->STATUS_ACTIVE]);
+    $product_stmt->execute([":code" => $productCode, ":status" => Status::ACTIVE]);
 
     if ($product_stmt->rowCount() === 0) {
       throw new ApiException("Product doesn't exist.", 404);
