@@ -79,6 +79,23 @@ class Product extends BaseModel
     parent::softDelete($productId);
   }
 
+  public function discountStock(array $orderItem): void
+  {
+    $productId = $orderItem['product_code'];
+    $orderItemAmount = $orderItem['amount'];
+
+    $discountStatement = $this->db->prepare(
+      "UPDATE products p 
+      SET amount = amount - :item_amount
+      WHERE p.code = :product_code"
+    );
+
+    $discountStatement->execute([
+      ":item_amount" =>  $orderItemAmount,
+      ":product_code" => $productId
+    ]);
+  }
+
   /**
    * @param array<string, mixed> $data
    * @return void
@@ -137,4 +154,5 @@ class Product extends BaseModel
     $result = $stmt->fetchColumn();
     return (float)$result;
   }
+
 }

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Models\Order;
 use App\Exceptions\ApiException;
+use App\Services\FinishOrderService;
 use PDO;
 
 class FinishOrderController
 {
 
   private PDO $db;
+  private FinishOrderService $finishOrderService;
 
   public function __construct(PDO $db)
   {
+    $this->finishOrderService = new FinishOrderService($db);
     $this->db = $db;
   }
 
@@ -27,8 +29,7 @@ class FinishOrderController
     try {
       header('Content-Type: application/json');
 
-      $model = new Order($this->db);
-      $model->finish($orderId);
+      $this->finishOrderService->finish($orderId);
       echo json_encode(["message" => "Order finished successfully."]);
     } catch (ApiException $e) {
       $code = $e->getCode() ?: 500;

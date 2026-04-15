@@ -116,6 +116,19 @@ class OrderItem extends BaseModel
   }
 
   /**
+   * @return array<int, array<string, mixed>>
+   */
+  public function findItemsByOrder(int $openOrderId): array {
+    $orderItemSelectStmt = $this->db->prepare(
+        "SELECT *
+        FROM order_item oi
+        WHERE oi.order_code = :order_code"
+      );
+      $orderItemSelectStmt->execute([":order_code" => $openOrderId]);
+      return $orderItemSelectStmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  /**
    * @return array<string, mixed>
    */
   public function findItemByOrderAndProduct(int $productId, int $orderId)

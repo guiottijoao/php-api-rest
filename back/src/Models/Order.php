@@ -58,42 +58,6 @@ class Order extends BaseModel
     return $result;
   }
 
-  public function finish(int $orderId): void
-  {
-    $orderSelectStmt = $this->db->prepare(
-      "SELECT * FROM orders o
-      WHERE o.code = :code
-      AND o.status = :status"
-    );
-    $orderSelectStmt->execute([":code" => $orderId, ":status" => Status::OPEN]);
-    $openOrder = $orderSelectStmt->fetch(PDO::FETCH_ASSOC);
-    if ($openOrder) {
-      $openOrderId = $openOrder['code'];
-      $orderItemSelectStmt = $this->db->prepare(
-        "SELECT *
-        FROM order_item oi
-        WHERE oi.order_code = :order_code"
-      );
-      $orderItemSelectStmt->execute([":order_code" => $openOrderId]);
-      $orderItems = $orderItemSelectStmt->fetchAll(PDO::FETCH_ASSOC);
-
-      if (!$orderItems) {
-        throw new ApiException("You dont have items in your order.");
-      }
-
-      foreach ($orderItems as $item) {
-        $this->discountStock($item);
-      }
-
-      $openOrderUpdateStmt = $this->db->prepare(
-        "UPDATE orders
-        SET status = :status
-        WHERE code = :code"
-      );
-      $openOrderUpdateStmt->execute([":status" => Status::CLOSED, ":code" => $orderId]);
-    }
-  }
-
   public function cancel(int $orderId): void
   {
     $activeOrderStmt = $this->db->prepare("SELECT *
@@ -153,23 +117,6 @@ class Order extends BaseModel
     }
   }
 
-  private function discountStock(array $orderItem): void
-  {
-    $productId = $orderItem['product_code'];
-    $orderItemAmount = $orderItem['amount'];
-
-    $discountStatement = $this->db->prepare(
-      "UPDATE products p 
-      SET amount = amount - :item_amount
-      WHERE p.code = :product_code"
-    );
-
-    $discountStatement->execute([
-      ":item_amount" =>  $orderItemAmount,
-      ":product_code" => $productId
-    ]);
-  }
-
   /**
    * @return array<string, mixed>|false
    */
@@ -183,7 +130,10 @@ class Order extends BaseModel
     return $orderSelectStmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  public function insertNewOrder(float $itemTotalPrice, float $itemTotalTax): void
+  /**
+   * @return array<string, mixed>
+   */
+  public function insertNewOrder(float $itemTotalPrice, float $itemTotalTax): array
   {
     $orderInsertStmt = $this->db->prepare(
       "INSERT INTO orders (total, tax, business_code)
@@ -194,6 +144,7 @@ class Order extends BaseModel
       ":tax" => $itemTotalTax,
       ":business_code" => parent::generateBusinessCode()
     ]);
+    return $orderInsertStmt->fetch(PDO::FETCH_ASSOC);
   }
 
   public function updateOrder(float $totalPrice, float $totalTax, string $status): void
@@ -209,5 +160,15 @@ class Order extends BaseModel
       ":tax" => $totalTax,
       ":status" => $status
     ]);
+  }
+
+  public function closeOrder(int $orderId): void
+  {
+    $openOrderUpdateStmt = $this->db->prepare(
+      "UPDATE orders
+        SET status = :status
+        WHERE code = :code"
+    );
+    $openOrderUpdateStmt->execute([":status" => Status::CLOSED, ":code" => $orderId]);
   }
 }
