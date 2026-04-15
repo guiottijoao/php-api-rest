@@ -130,6 +130,19 @@ class Order extends BaseModel
     ]);
   }
 
+  public function getOrderStatusFromItem(int $itemId): string
+  {
+    $orderStmt = $this->db->prepare(
+      "SELECT o.status FROM orders o
+    INNER JOIN order_item oi
+    ON o.code = oi.order_code
+    WHERE oi.code = :code
+    "
+    );
+    $orderStmt->execute([":code" => $itemId]);
+    return $orderStmt->fetchColumn();
+  }
+
   public function resetOrder(int $orderId): void
   {
     $updateOrderTotalAndTaxStmt = $this->db->prepare(

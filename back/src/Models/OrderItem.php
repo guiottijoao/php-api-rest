@@ -32,6 +32,19 @@ class OrderItem extends BaseModel
   public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+
+    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($items as $index => $item) {
+      $items[$index]['total'] = $this->appendTotal($item);
+      $orderStatus = $this->getOrderStatusFromItem($item['code']);
+      $items[$index]['order_status'] = $orderStatus;
+      $items[$index]['product_name'] = $this->orderItemService->getProductName($item['code']);
+    }
+    return $items;
+  }
+
+  public function getOrderStatusFromItem(int $itemId): string
+  {
     $orderStmt = $this->db->prepare(
       "SELECT o.status FROM orders o
     INNER JOIN order_item oi
@@ -39,15 +52,8 @@ class OrderItem extends BaseModel
     WHERE oi.code = :code
     "
     );
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($items as $index => $item) {
-      $items[$index]['total'] = $this->appendTotal($item);
-      $orderStmt->execute([":code" => $item['code']]);
-      $orderStatus = $orderStmt->fetchColumn();
-      $items[$index]['order_status'] = $orderStatus;
-      $items[$index]['product_name'] = $this->orderItemService->getProductName($item['code']);
-    }
-    return $items;
+    $orderStmt->execute([":code" => $itemId]);
+    return $orderStmt->fetchColumn();
   }
 
   /**
