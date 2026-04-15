@@ -44,7 +44,7 @@ class OrderItem extends BaseModel
       $items[$index]['total'] = $this->appendTotal($item);
       $orderStmt->execute([":code" => $item['code']]);
       $orderStatus = $orderStmt->fetchColumn();
-      $items[$index]['orderStatus'] = $orderStatus;
+      $items[$index]['order_status'] = $orderStatus;
       $items[$index]['product_name'] = $this->orderItemService->getProductName($item['code']);
     }
     return $items;
