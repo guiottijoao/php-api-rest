@@ -56,7 +56,7 @@ class OrderItemService
    * @param int $amount
    * @return float
    */
-  public function calcOrderItemTotalTax(
+  public function calculateItemTotalTax(
     float $taxPercent,
     float $unitPrice,
     int $amount

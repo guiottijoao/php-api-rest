@@ -36,7 +36,7 @@ class CreateOrderItemService
     $categoryTax = $this->orderItemService->getCategoryTax($productId);
     $productAmount = $data['amount'];
     $productPrice = $this->orderItemService->getProductPrice($productId);
-    $orderItemTotalTax = $this->orderItemService->calcOrderItemTotalTax(
+    $orderItemTotalTax = $this->orderItemService->calculateItemTotalTax(
       $categoryTax,
       $productPrice,
       $productAmount
@@ -72,13 +72,13 @@ class CreateOrderItemService
       if ($this->orderItemService->isOrderItemRepeated($productId, $activeOrder['code'])) {
         $existingOrderItem = $this->orderItem->findItemByOrderAndProduct($productId, $activeOrder['code']);
         $amountsAdded = $data['amount'] + $existingOrderItem['amount'];
-        $newTotalTax = $this->orderItemService->calcOrderItemTotalTax(
+        $newTotalTax = $this->orderItemService->calculateItemTotalTax(
           $categoryTax,
           $productPrice,
           $data['amount']
         ) + $existingOrderItem['tax'];
 
-        $item = $this->orderItem->joinRepeatedItems($amountsAdded, $newTotalTax, $productId);
+        $item = $this->orderItem->updateExistingItemQuantitys($amountsAdded, $newTotalTax, $productId);
         return $item;
       }
 

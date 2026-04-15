@@ -95,7 +95,7 @@ class OrderItem extends BaseModel
   /**
    * @return array<string, mixed>
    */
-  public function joinRepeatedItems(float $amountsAdded, float $newTotalTax, int $productId)
+  public function updateExistingItemQuantitys(float $amountsAdded, float $newTotalTax, int $productId)
   {
     $existing_item_stmt = $this->db->prepare(
       "UPDATE order_item o
