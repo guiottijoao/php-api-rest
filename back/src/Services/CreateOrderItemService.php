@@ -78,11 +78,9 @@ class CreateOrderItemService
           $data['amount']
         ) + $existingOrderItem['tax'];
 
-        $item = $this->orderItem->updateExistingItemQuantitys($amountsAdded, $newTotalTax, $productId);
+        $item = $this->orderItem->updateExistingItemQuantity($amountsAdded, $newTotalTax, $productId);
         return $item;
       }
-
-      // se tiver pedido repetido faz isso a cima, se nao:
 
       $item = $this->orderItem->insertNewItem([
         'order_code' => $activeOrder['code'],
@@ -95,6 +93,4 @@ class CreateOrderItemService
       return $item;
     }
   }
-
-  public function addItemToNewOrder() {}
 }
