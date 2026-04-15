@@ -107,13 +107,13 @@ abstract class BaseModel
 
   public function verifyExistence(int $id): void
   {
-    $check_existence_stmt = $this->db->prepare(
+    $checkExistenceStmt = $this->db->prepare(
       "SELECT code
       FROM {$this->table}
       WHERE code = :id"
     );
-    $check_existence_stmt->execute([":id" => $id]);
-    if (!$check_existence_stmt->fetchColumn()) {
+    $checkExistenceStmt->execute([":id" => $id]);
+    if (!$checkExistenceStmt->fetchColumn()) {
       throw new ApiException("{$this->table} not found.", 404);
     }
   }
@@ -121,7 +121,7 @@ abstract class BaseModel
   public function hasAssociatedRecord(int $id, string $table): void
   {
     if ($table === 'products') {
-      $associated_registers_stmt = $this->db->prepare(
+      $associatedRecordsStmt = $this->db->prepare(
         "SELECT * FROM order_item oi
         INNER JOIN orders o
         ON oi.order_code = o.code
@@ -129,25 +129,25 @@ abstract class BaseModel
         AND o.status = :status"
       );
 
-      $associated_registers_stmt->execute([':product_code' => $id, ':status' => Status::OPEN]);
+      $associatedRecordsStmt->execute([':product_code' => $id, ':status' => Status::OPEN]);
     } else if ($table === 'categories') {
-      $associated_registers_stmt = $this->db->prepare(
+      $associatedRecordsStmt = $this->db->prepare(
         "SELECT * FROM products p
       WHERE p.category_code = :category_code
       AND p.status = :status"
       );
 
-      $associated_registers_stmt->execute([":category_code" => $id, ':status' => Status::OPEN]);
+      $associatedRecordsStmt->execute([":category_code" => $id, ':status' => Status::OPEN]);
     } else {
-      $associated_registers_stmt = $this->db->prepare(
+      $associatedRecordsStmt = $this->db->prepare(
         "SELECT * FROM order_item oi
       WHERE oi.order_code = :code"
       );
 
-      $associated_registers_stmt->execute([':code' => $id]);
+      $associatedRecordsStmt->execute([':code' => $id]);
     }
 
-    if ($associated_registers_stmt->fetch()) {
+    if ($associatedRecordsStmt->fetch()) {
       throw new ApiException("Can't delete, this item has associated registers.", 422);
     }
   }

@@ -32,7 +32,7 @@ class OrderItem extends BaseModel
   public function list(): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
-    $order_stmt = $this->db->prepare(
+    $orderStmt = $this->db->prepare(
       "SELECT o.status FROM orders o
     INNER JOIN order_item oi
     ON o.code = oi.order_code
@@ -42,9 +42,9 @@ class OrderItem extends BaseModel
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($items as $index => $item) {
       $items[$index]['total'] = $this->appendTotal($item);
-      $order_stmt->execute([":code" => $item['code']]);
-      $order_status = $order_stmt->fetchColumn();
-      $items[$index]['order_status'] = $order_status;
+      $orderStmt->execute([":code" => $item['code']]);
+      $orderStatus = $orderStmt->fetchColumn();
+      $items[$index]['orderStatus'] = $orderStatus;
       $items[$index]['product_name'] = $this->orderItemService->getProductName($item['code']);
     }
     return $items;
@@ -69,7 +69,7 @@ class OrderItem extends BaseModel
    */
   public function insertNewItem(array $data): array
   {
-    $insert_item_stmt = $this->db->prepare(
+    $insertItemStmt = $this->db->prepare(
       "INSERT INTO order_item
       (order_code, product_code, amount, price, tax, business_code)
         VALUES
@@ -77,7 +77,7 @@ class OrderItem extends BaseModel
         RETURNING *"
     );
 
-    $insert_item_stmt->execute([
+    $insertItemStmt->execute([
       ":order_code" => $data['order_code'],
       ":product_code" => $data['product_code'],
       ":amount" => $data['amount'],
@@ -86,7 +86,7 @@ class OrderItem extends BaseModel
       ":business_code" => $data['business_code']
     ]);
 
-    $item = $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
+    $item = $insertItemStmt->fetch(PDO::FETCH_ASSOC);
     $item['total'] = $this->appendTotal($item);
 
     return $item;
@@ -97,20 +97,20 @@ class OrderItem extends BaseModel
    */
   public function updateExistingItemQuantitys(float $amountsAdded, float $newTotalTax, int $productId)
   {
-    $existing_item_stmt = $this->db->prepare(
+    $existingItemStmt = $this->db->prepare(
       "UPDATE order_item o
               SET amount = :new_amount, tax = :new_total_tax
               WHERE product_code = :product_code
               RETURNING *"
     );
 
-    $existing_item_stmt->execute([
+    $existingItemStmt->execute([
       ":new_amount" => $amountsAdded,
       ":new_total_tax" => $newTotalTax,
       ":product_code" => $productId
     ]);
 
-    $item = $existing_item_stmt->fetch(PDO::FETCH_ASSOC);
+    $item = $existingItemStmt->fetch(PDO::FETCH_ASSOC);
     $item['total'] = $this->appendTotal($item);
     return $item;
   }
@@ -149,15 +149,15 @@ class OrderItem extends BaseModel
     $productCode = $data['product_code'];
     $amount = $data['amount'];
 
-    $product_stmt = $this->db->prepare(
+    $productStmt = $this->db->prepare(
       "SELECT *
       FROM products
       WHERE code = :code
       AND status = :status"
     );
-    $product_stmt->execute([":code" => $productCode, ":status" => Status::ACTIVE]);
+    $productStmt->execute([":code" => $productCode, ":status" => Status::ACTIVE]);
 
-    if ($product_stmt->rowCount() === 0) {
+    if ($productStmt->rowCount() === 0) {
       throw new ApiException("Product doesn't exist.", 404);
     }
     if ($amount < $this->MIN_PRODUCT_AMOUNT || $amount > $this->MAX_PRODUCT_AMOUNT || !filter_var($amount, FILTER_VALIDATE_INT)) {

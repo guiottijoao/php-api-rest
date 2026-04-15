@@ -24,15 +24,15 @@ class OrderItemService
    */
   public function getCategoryTax(int $productId): float
   {
-    $search_category_tax = $this->db->prepare(
+    $searchCategoryTaxStmt = $this->db->prepare(
       "SELECT c.tax
       FROM categories c
       INNER JOIN products p
       ON c.code = p.category_code
       WHERE p.code = :product_code"
     );
-    $search_category_tax->execute([":product_code" => $productId]);
-    return (float)$search_category_tax->fetchColumn();
+    $searchCategoryTaxStmt->execute([":product_code" => $productId]);
+    return (float)$searchCategoryTaxStmt->fetchColumn();
   }
 
   /**
@@ -41,13 +41,13 @@ class OrderItemService
    */
   public function getProductPrice(int $productId): float
   {
-    $search_product_price = $this->db->prepare(
+    $searchProductPrice = $this->db->prepare(
       "SELECT p.price
         FROM products p
         WHERE p.code = :product_code"
     );
-    $search_product_price->execute([":product_code" => $productId]);
-    return (float)$search_product_price->fetchColumn();
+    $searchProductPrice->execute([":product_code" => $productId]);
+    return (float)$searchProductPrice->fetchColumn();
   }
 
   /**
@@ -120,7 +120,7 @@ class OrderItemService
    */
   public function verifyStockAvailability(int $productId, array $orderItem): bool
   {
-    $existing_item_amount_stmt = $this->db->prepare(
+    $existingItemAmountStmt = $this->db->prepare(
       "SELECT amount
       FROM order_item oi
       INNER JOIN orders o
@@ -128,19 +128,19 @@ class OrderItemService
       WHERE oi.product_code = :product_code
       AND o.status = :status"
     );
-    $product_stmt = $this->db->prepare(
+    $productStmt = $this->db->prepare(
       "SELECT *
       FROM products
       WHERE code = :code"
     );
-    $product_stmt->execute([":code" => $productId]);
-    $product = $product_stmt->fetch(PDO::FETCH_ASSOC);
+    $productStmt->execute([":code" => $productId]);
+    $product = $productStmt->fetch(PDO::FETCH_ASSOC);
 
-    $existing_item_amount_stmt->execute([
+    $existingItemAmountStmt->execute([
       ":product_code" => $orderItem['product_code'],
       ":status" => Status::OPEN
     ]);
-    $existingItemAmount = $existing_item_amount_stmt->fetchColumn();
+    $existingItemAmount = $existingItemAmountStmt->fetchColumn();
     if ($product['amount'] < $orderItem['amount'] + $existingItemAmount) {
       if ($product['amount'] === 0) {
         throw new ApiException("This product is out of stock.");

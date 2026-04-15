@@ -114,13 +114,13 @@ class Product extends BaseModel
       );
     }
 
-    $verify_fk_existence = $this->db->prepare(
+    $verifyFkExistenceStmt = $this->db->prepare(
       "SELECT COUNT(*)
       FROM categories
       WHERE code = :category_code"
     );
-    $verify_fk_existence->execute([":category_code" => $categoryCode]);
-    if (!$verify_fk_existence->fetchColumn()) {
+    $verifyFkExistenceStmt->execute([":category_code" => $categoryCode]);
+    if (!$verifyFkExistenceStmt->fetchColumn()) {
       throw new ApiException("Category does not exist.");
     }
   }
