@@ -95,7 +95,7 @@ class OrderItem extends BaseModel
   /**
    * @return array<string, mixed>
    */
-  public function updateExistingItemQuantitys(float $amountsAdded, float $newTotalTax, int $productId)
+  public function updateExistingItemQuantity(float $amountsAdded, float $newTotalTax, int $productId)
   {
     $existingItemStmt = $this->db->prepare(
       "UPDATE order_item o
@@ -118,14 +118,15 @@ class OrderItem extends BaseModel
   /**
    * @return array<int, array<string, mixed>>
    */
-  public function findItemsByOrder(int $openOrderId): array {
+  public function findItemsByOrder(int $openOrderId): array
+  {
     $orderItemSelectStmt = $this->db->prepare(
-        "SELECT *
+      "SELECT *
         FROM order_item oi
         WHERE oi.order_code = :order_code"
-      );
-      $orderItemSelectStmt->execute([":order_code" => $openOrderId]);
-      return $orderItemSelectStmt->fetchAll(PDO::FETCH_ASSOC);
+    );
+    $orderItemSelectStmt->execute([":order_code" => $openOrderId]);
+    return $orderItemSelectStmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   /**
@@ -142,6 +143,15 @@ class OrderItem extends BaseModel
       ":order_code" => $orderId
     ]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
+  }
+
+  public function deleteItemsByOrder(int $orderId): void
+  {
+    $deleteOrderItemsStmt = $this->db->prepare(
+      "DELETE FROM order_item o
+      WHERE o.order_code = :order_code"
+    );
+    $deleteOrderItemsStmt->execute([":order_code" => $orderId]);
   }
 
   public function delete(int $orderItemId): void

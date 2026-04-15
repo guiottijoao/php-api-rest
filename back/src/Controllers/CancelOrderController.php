@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Models\Order;
 use App\Exceptions\ApiException;
+use App\Services\CancelOrderService;
 use PDO;
 
 class CancelOrderController
 {
 
   private PDO $db;
+  private CancelOrderService $cancelOrderService;
 
   public function __construct(PDO $db)
   {
+    $this->cancelOrderService = new CancelOrderService($db);
     $this->db = $db;
   }
 
@@ -27,8 +29,7 @@ class CancelOrderController
     try {
       header('Content-Type: application/json');
 
-      $model = new Order($this->db);
-      $model->cancel($orderId);
+      $this->cancelOrderService->cancel($orderId);
       echo json_encode(["message" => "Order cancelled successfully."]);
     } catch (ApiException $e) {
       $code = (int)$e->getCode() ?: 500;

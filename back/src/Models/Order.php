@@ -58,38 +58,6 @@ class Order extends BaseModel
     return $result;
   }
 
-  public function cancel(int $orderId): void
-  {
-    $activeOrderStmt = $this->db->prepare("SELECT *
-    FROM orders o
-    WHERE o.code = :code
-    AND o.status = :status");
-    $activeOrderStmt->execute([":code" => $orderId, ":status" => Status::OPEN]);
-    $order = $activeOrderStmt->fetch(PDO::FETCH_ASSOC);
-    if (!$order) throw new ApiException("Order not found.", 404);
-
-    $orderItemsStmt = $this->db->prepare(
-      "SELECT * FROM order_item
-      WHERE order_code = :order_code"
-    );
-    $orderItemsStmt->execute([":order_code" => $orderId]);
-    $orderItems = $orderItemsStmt->fetchAll(PDO::FETCH_ASSOC);
-    if (!$orderItems) throw new ApiException("Order has no items.", 400);
-
-    $deleteOrderItemsStmt = $this->db->prepare(
-      "DELETE FROM order_item o
-      WHERE o.order_code = :order_code"
-    );
-    $deleteOrderItemsStmt->execute([":order_code" => $order['code']]);
-
-    $updateOrderTotalAndTaxStmt = $this->db->prepare(
-      "UPDATE orders o
-      SET total = 0, tax = 0 WHERE
-      o.code = :order_code"
-    );
-    $updateOrderTotalAndTaxStmt->execute([":order_code" => $order['code']]);
-  }
-
   public function delete(int $orderId): void
   {
     parent::verifyExistence($orderId);
@@ -160,6 +128,16 @@ class Order extends BaseModel
       ":tax" => $totalTax,
       ":status" => $status
     ]);
+  }
+
+  public function resetOrder(int $orderId): void
+  {
+    $updateOrderTotalAndTaxStmt = $this->db->prepare(
+      "UPDATE orders o
+      SET total = 0, tax = 0 WHERE
+      o.code = :order_code"
+    );
+    $updateOrderTotalAndTaxStmt->execute([":order_code" => $orderId]);
   }
 
   public function closeOrder(int $orderId): void
