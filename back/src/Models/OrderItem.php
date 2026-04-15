@@ -40,11 +40,7 @@ class OrderItem extends BaseModel
     );
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($items as $index => $i) {
-      $items[$index]['total'] = $this->orderItemService->getOrderItemTotalPrice(
-        $i['tax'],
-        $i['price'],
-        $i['amount'],
-      );
+      $items[$index]['total'] = $this->appendTotal($i);
       $order_stmt->execute([":code" => $i['code']]);
       $order_status = $order_stmt->fetchColumn();
       $items[$index]['order_status'] = $order_status;
@@ -90,11 +86,7 @@ class OrderItem extends BaseModel
     ]);
 
     $item = $insert_item_stmt->fetch(PDO::FETCH_ASSOC);
-    $item['total'] = $this->orderItemService->getOrderItemTotalPrice(
-      $item['tax'],
-      $item['price'],
-      $item['amount']
-    );
+    $item['total'] = $this->appendTotal($item);
 
     return $item;
   }
@@ -118,11 +110,7 @@ class OrderItem extends BaseModel
     ]);
 
     $item = $existing_item_stmt->fetch(PDO::FETCH_ASSOC);
-    $item['total'] = $this->orderItemService->getOrderItemTotalPrice(
-      $item['tax'],
-      $item['price'],
-      $item['amount']
-    );
+    $item['total'] = $this->appendTotal($item);
     return $item;
   }
 
@@ -191,5 +179,16 @@ class OrderItem extends BaseModel
     if (!$verify_associated_product_existence->fetchColumn()) {
       throw new ApiException("Product does not exist.", 404);
     }
+  }
+
+  private function appendTotal(array $item): array
+  {
+    $item['total'] = $this->orderItemService->getOrderItemTotalPrice(
+      $item['tax'],
+      $item['price'],
+      $item['amount']
+    );
+
+    return $item;
   }
 }
