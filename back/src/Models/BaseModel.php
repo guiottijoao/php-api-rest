@@ -137,7 +137,7 @@ abstract class BaseModel
       AND p.status = :status"
       );
 
-      $associatedRecordsStmt->execute([":category_code" => $id, ':status' => Status::OPEN]);
+      $associatedRecordsStmt->execute([":category_code" => $id, ':status' => Status::ACTIVE]);
     } else {
       $associatedRecordsStmt = $this->db->prepare(
         "SELECT * FROM order_item oi
