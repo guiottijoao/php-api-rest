@@ -26,8 +26,8 @@ class Product extends BaseModel
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($items as $index => $i) {
-      $items[$index]['tax'] = $this->getTaxById($i['code']);
+    foreach ($items as $index => $item) {
+      $items[$index]['tax'] = $this->getTaxById($item['code']);
     }
     return $items;
   }

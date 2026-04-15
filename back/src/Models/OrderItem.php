@@ -40,12 +40,12 @@ class OrderItem extends BaseModel
     "
     );
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($items as $index => $i) {
-      $items[$index]['total'] = $this->appendTotal($i);
-      $order_stmt->execute([":code" => $i['code']]);
+    foreach ($items as $index => $item) {
+      $items[$index]['total'] = $this->appendTotal($item);
+      $order_stmt->execute([":code" => $item['code']]);
       $order_status = $order_stmt->fetchColumn();
       $items[$index]['order_status'] = $order_status;
-      $items[$index]['product_name'] = $this->orderItemService->getProductName($i['code']);
+      $items[$index]['product_name'] = $this->orderItemService->getProductName($item['code']);
     }
     return $items;
   }
