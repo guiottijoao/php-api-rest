@@ -81,7 +81,7 @@ class CreateOrderItemService
           $data['amount']
         ) + $existingOrderItem['tax'];
 
-        $item = $this->orderItem->updateExistingItemQuantity($amountsAdded, $newTotalTax, $productId);
+        $item = $this->orderItem->updateExistingItemQuantity($activeOrder['code'], $amountsAdded, $newTotalTax, $productId);
         return $item;
       }
 

@@ -101,19 +101,21 @@ class OrderItem extends BaseModel
   /**
    * @return array<string, mixed>
    */
-  public function updateExistingItemQuantity(float $amountsAdded, float $newTotalTax, int $productId)
+  public function updateExistingItemQuantity(int $orderId, float $amountsAdded, float $newTotalTax, int $productId)
   {
     $existingItemStmt = $this->db->prepare(
       "UPDATE order_item o
               SET amount = :new_amount, tax = :new_total_tax
               WHERE product_code = :product_code
+              AND order_code = :order_code
               RETURNING *"
     );
-
+    
     $existingItemStmt->execute([
       ":new_amount" => $amountsAdded,
       ":new_total_tax" => $newTotalTax,
-      ":product_code" => $productId
+      ":product_code" => $productId,
+      ":order_code" => $orderId
     ]);
 
     $item = $existingItemStmt->fetch(PDO::FETCH_ASSOC);
