@@ -29,7 +29,7 @@ function Products() {
       placeholder: "Price",
       step: "0.01",
       min: "0.1",
-      max: "10000000000",
+      max: "1000000000",
     },
   ];
 
