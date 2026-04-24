@@ -84,16 +84,35 @@ class Product extends BaseModel
     $productId = $orderItem['product_code'];
     $orderItemAmount = $orderItem['amount'];
 
+    $productsStockStatement = $this->db->prepare(
+      "SELECT p.amount
+      FROM products p
+      WHERE p.code = :product_code"
+    );
+    $productsStockStatement->execute([":product_code" => $productId]);
+    $productStockAmount = $productsStockStatement->fetchColumn();
+
+    if ($productStockAmount === false) {
+      throw new ApiException("Product not found.", 404);
+    }
+    
+    if ($productStockAmount < $orderItemAmount) {
+      throw new ApiException("Insufficient stock", 400);
+    }
+
     $discountStatement = $this->db->prepare(
       "UPDATE products p 
       SET amount = amount - :item_amount
       WHERE p.code = :product_code"
     );
-
     $discountStatement->execute([
       ":item_amount" =>  $orderItemAmount,
       ":product_code" => $productId
     ]);
+
+    if ($discountStatement->rowCount() === 0) {
+      throw new ApiException("Product not found", 404);
+    }
   }
 
   /**
