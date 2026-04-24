@@ -4,14 +4,14 @@ function HistoryTable({ orders, onSetModal }) {
   return (
     <div className="table-container">
       <table>
-        <tbody>
+        <thead>
           <tr>
             <th>Code</th>
             <th>Tax</th>
             <th>Total</th>
             <th>Product details</th>
           </tr>
-        </tbody>
+        </thead>
         <tbody id="history-table-body">
           {orders.map((o) => (
             <tr key={o.code}>

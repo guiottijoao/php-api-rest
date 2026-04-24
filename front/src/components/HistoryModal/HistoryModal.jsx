@@ -25,14 +25,14 @@ function HistoryModal({ isModalOpen, selectedId, onCloseModal }) {
               </div>
             </nav>
             <table className={styles.orderProductsTable}>
-              <tbody>
+              <thead>
                 <tr>
                   <th>Name</th>
                   <th>Amount</th>
                   <th>Unit Price</th>
                   <th>Total tax</th>
                 </tr>
-              </tbody>
+              </thead>
               <tbody id={styles.orderProductsTableContent}>
                 {selectedOrderItems.map((o) => (
                   <tr key={o.code}>
