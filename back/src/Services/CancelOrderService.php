@@ -27,11 +27,14 @@ class CancelOrderService
     $activeOrder = $this->order->findOpenOrder();
     if (!$activeOrder) throw new ApiException("Order not found.", 404);
 
+    if ((int)$activeOrder['code'] !== $orderId) {
+      throw new ApiException("Order is not open.", 400)
+    }
+
     $orderItems = $this->orderItem->findItemsByOrder($orderId);
     if (!$orderItems) throw new ApiException("Order has no items.", 400);
 
     $this->orderItem->deleteItemsByOrder($orderId);
-
     $this->order->resetOrder($orderId);
   }
 }
