@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Models\BaseModel;
 use PDO;
@@ -15,6 +16,14 @@ class Category extends BaseModel
   public function __construct(PDO $db)
   {
     $this->db = $db;
+  }
+
+  /**
+   * @return array<int, array<string, mixed>>
+   */
+  public function list(?string $status = null): array
+  {
+    return parent::list(Status::ACTIVE);
   }
 
   /**

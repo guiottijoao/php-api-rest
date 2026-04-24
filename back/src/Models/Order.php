@@ -19,6 +19,22 @@ class Order extends BaseModel
   }
 
   /**
+   * @return array<int, array<string, mixed>>
+   */
+  public function list(?string $status = null): array
+  {
+    return parent::list(Status::OPEN);
+  }
+
+  /**
+   * @return array<int, array<string, mixed>>
+   */
+  public function listHistory(): array
+  {
+    return parent::list(Status::CLOSED);
+  }
+
+  /**
    * @param int $id
    * @return array<string, mixed>
    */

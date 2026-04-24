@@ -8,10 +8,11 @@ use App\Controllers\FinishOrderController;
 use App\Controllers\OrderController;
 
 return [
-    'categories'   => CategoryController::class,
-    'products'     => ProductsController::class,
-    'orders'       => OrderController::class,
-    'finish-order' => FinishOrderController::class,
-    'cancel-order' => CancelOrderController::class,
-    'order-items'  => OrderItemController::class,
+    'categories'    => CategoryController::class,
+    'products'      => ProductsController::class,
+    'orders'        => OrderController::class,
+    'order-history' => OrderController::class,
+    'finish-order'  => FinishOrderController::class,
+    'cancel-order'  => CancelOrderController::class,
+    'order-items'   => OrderItemController::class,
 ];

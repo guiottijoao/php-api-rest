@@ -29,7 +29,7 @@ class OrderItem extends BaseModel
   /**
    * @return array<int, array<string, mixed>>
    */
-  public function list(): array
+  public function list(?string $status = null): array
   {
     $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
 

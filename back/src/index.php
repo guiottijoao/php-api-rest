@@ -50,7 +50,11 @@ if (isset($controllers[$route])) {
   }
   $controller = new $controllerName($db);
 
-  $action = $actions[$method];
+  if ($route === 'order-history') {
+    $action = 'history';
+  } else {
+    $action = $actions[$method];
+  }
 
   if (method_exists($controller, $action)) {
     if ($id !== null) {

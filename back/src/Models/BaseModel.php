@@ -41,11 +41,16 @@ abstract class BaseModel
   }
 
   /**
-   * @return<int, array<string, mixed>>
+   * @return array<int, array<string, mixed>>
    */
-  public function list(): array
+  public function list(?string $status = null): array
   {
-    $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+    if ($status !== null) {
+      $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE status = :status ORDER BY code ASC");
+      $stmt->execute([':status' => $status]);
+    } else {
+      $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+    }
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 

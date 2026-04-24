@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Models\BaseModel;
 use PDO;
@@ -22,9 +23,10 @@ class Product extends BaseModel
   /**
    * @return array<int, array<string, mixed>>
    */
-  public function list(): array
+  public function list(?string $status = null): array
   {
-    $stmt = $this->db->query("SELECT * FROM {$this->table} ORDER BY code ASC");
+    $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE status = :status ORDER BY code ASC");
+    $stmt->execute([':status' => Status::ACTIVE]);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach ($items as $index => $item) {
       $items[$index]['tax'] = $this->getTaxById($item['code']);
