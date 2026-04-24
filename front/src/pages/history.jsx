@@ -3,7 +3,7 @@ import HistoryTable from "../components/HistoryTable/HistoryTable";
 import PageTitle from "../components/PageTitle/PageTitle";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { fetchOrders } from "../store/slices/orderSlice";
+import { fetchOrderHistory } from "../store/slices/orderSlice";
 import { fetchOrderItems } from "../store/slices/orderItemSlice";
 
 function History() {
@@ -12,7 +12,7 @@ function History() {
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
 
-  const { items: orders, loading: ordersLoading } = useSelector(
+  const { history: orders, loading: ordersLoading } = useSelector(
     (state) => state.orders,
   );
 
@@ -32,12 +32,12 @@ function History() {
 
   useEffect(() => {
     dispatch(fetchOrderItems())
-    dispatch(fetchOrders())
+    dispatch(fetchOrderHistory())
   }, [dispatch])
 
   if (ordersLoading) return <p>Loading</p>
 
-  const historyOrders = orders.filter((o) => o.status === 'closed')
+  const historyOrders = orders;
 
   return (
     <div className="container">

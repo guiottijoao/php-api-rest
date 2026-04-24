@@ -72,8 +72,8 @@ function Products() {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  const activeCategories = categories.filter((c) => c.status === "active");
-  const activeProducts = products.filter((p) => p.status === "active");
+  const activeCategories = categories;
+  const activeProducts = products;
   const activeOrderItems = useMemo(
     () => orderItems.filter((o) => o.order_status === "open"),
     [orderItems],

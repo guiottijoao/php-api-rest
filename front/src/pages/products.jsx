@@ -55,8 +55,8 @@ function Products() {
     error,
   } = useSelector((state) => state.products);
 
-  const activeCategories = categories.filter((c) => c.status === "active");
-  const activeProducts = products.filter((p) => p.status === "active");
+  const activeCategories = categories;
+  const activeProducts = products;
 
   const columns = [
     { key: "business_code", label: "Code" },

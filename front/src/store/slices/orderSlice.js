@@ -12,6 +12,17 @@ export const fetchOrders = createAsyncThunk(
   },
 );
 
+export const fetchOrderHistory = createAsyncThunk(
+  "orders/fetchHistory",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await orderService.getHistory();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
 export const cancelOrder = createAsyncThunk(
   "orders/cancel",
   async (id, { rejectWithValue }) => {
@@ -39,6 +50,7 @@ const orderSlice = createSlice({
 
   initialState: {
     items: [],
+    history: [],
     loading: false,
     error: null,
   },
@@ -60,6 +72,18 @@ const orderSlice = createSlice({
         state.items = action.payload;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchOrderHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrderHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.history = action.payload;
+      })
+      .addCase(fetchOrderHistory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

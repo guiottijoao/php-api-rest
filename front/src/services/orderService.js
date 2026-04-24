@@ -10,6 +10,15 @@ export const orderService = {
     return response.json();
   },
 
+  async getHistory() {
+    const response = await fetch(`${BASE_URL}/order-history`);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
+    return response.json();
+  },
+
   async cancelUpdate(id) {
     const response = await fetch(`${BASE_URL}/cancel-order/${id}`, {
       method: "PUT",
