@@ -4,7 +4,10 @@
   color: black;
   border: none;
   transition: ease-in-out 100ms;
-  padding: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .viewBtn:hover {

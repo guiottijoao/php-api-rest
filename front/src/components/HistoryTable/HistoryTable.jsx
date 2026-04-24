@@ -19,7 +19,7 @@ function HistoryTable({ orders, onSetModal }) {
               <td>${o.tax}</td>
               <td>${o.total}</td>
               <td>
-                <a onClick={() => onSetModal(o.code)} className={styles.viewBtn}>View</a>
+                <button onClick={() => onSetModal(o.code)} className={styles.viewBtn}>View</button>
               </td>
             </tr>
           ))}
