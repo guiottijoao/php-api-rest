@@ -1,11 +1,9 @@
-import { useEffect } from "react";
 import styles from "./HistoryModal.module.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 function HistoryModal({ isModalOpen, selectedId, onCloseModal }) {
-  const dispatch = useDispatch();
 
-  const { items: orderItems, loading: orderItemsLoading } = useSelector(
+  const { items: orderItems } = useSelector(
     (state) => state.orderItems,
   );
 
