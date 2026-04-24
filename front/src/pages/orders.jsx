@@ -20,7 +20,7 @@ import {
 } from "../store/slices/orderItemSlice.js";
 import Swal from "sweetalert2";
 
-function Products() {
+function Orders() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -233,4 +233,4 @@ function Products() {
     </div>
   );
 }
-export default Products;
+export default Orders;
